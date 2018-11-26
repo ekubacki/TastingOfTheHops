@@ -1,0 +1,138 @@
+/*
+
+
+//sign-up
+
+/rest/user/sign-up
+{
+  "firstName": "Eric",
+  "lastName" : "Kubacki",
+  "email" : "ejkubacki@gmail.com",
+
+  "beers" : [
+  	"beer": {
+      "name" : "The Good Stuff",
+      "brewery" : "This is a test brewery"
+	}
+  ]
+}
+return: {"userId": "stringValue"}
+
+/rest/user/look-up
+{
+	"firstName": "Eric",
+    "lastName" : "Kubacki"
+}
+return: {"userId" : "stringValue"}
+
+
+//next-up    ->> Need to add "display-name" to this.
+/rest/tasting/line-up
+{
+	"lineUp" : [
+		"nextUp": {
+	      "whoBroughtIt": ["displayName": "Eric Kubacki"],
+		  "beer": {
+	        "name": "The Good Stuff",
+	        "brewery": "This is a test brewery"
+		  }
+		},
+	    "nextUp": {
+	      "whoBroughtIt": ["displayName": "Kevin Kubacki", "displayName": "Amy Kubacki"],
+	      "beer": {
+	        "name": "The Bad Stuff",
+	        "brewery": "This is a test brewery"
+	      }
+	    }
+	]
+}
+
+// rateBeer - post
+/rest/tasting/rate
+{
+  "userId" : "usersId",
+  "beerId" : "beersId",
+  "rating" : 3
+}
+
+/rest/tasting/findAccount  <--- need help to know how to best do this?
+{
+	"name" : beers
+}
+
+return {"beerId": "value"}
+
+// top Beers - gets
+ - /rest/tasting/bestBeer?year=all-time
+ - /rest/tasting/bestBeer?year=2019
+
+
+
+
+Beer Model
+id : <string>
+Name: <string>
+Brewery: <string>
+Tasted: <boolean>  // i think this should be removed
+
+
+user model
+id: <string>
+firstName: <string>
+lastName: <string>
+displayName : firstName + " " + lastName
+
+
+BeerJoinTable
+userId : <string> forgein
+beerId : <string> forgein
+rating : <value> (1 / 5)
+tasting : <boolean>
+year : int
+
+ */
+
+
+//    private static final String ACCOUNT_INSERT_SQL = "Insert into accounts (account_id,first_name,last_name) "//
+//            + " values (?,?,?) ";
+//    private static final String BEER_INSERT_SQL = "Insert into beers (beer_id, name, brewery) "//
+//            + " values (?,?,?) ";
+//    private static final String TASTING_INSERT_SQL = "Insert into tastings (beer_id, account_id, year, tasted, rating) "
+//            + " values(?, ?, ?, ?, ?)";
+
+/*
+drop table accounts;
+drop table beers;
+drop table tastings;
+
+
+    CREATE TABLE IF NOT EXISTS accounts (
+        account_id VARCHAR(50) NOT NULL,
+        first_name VARCHAR(50) NOT NULL,
+        last_name VARCHAR(50) NOT NULL,
+        email VARCHAR(50),                    //need to figure out  if email is null don't trip find on this.
+    );
+
+    CREATE TABLE IF NOT EXISTS beers (
+        beer_id VARCHAR(50) NOT NULL,
+        name VARCHAR(50) NOT NULL,
+        brewery VARCHAR(50) NOT NULL,
+    );
+
+    CREATE TABLE IF NOT EXISTS tastings (
+        beer_id VARCHAR(50) NOT NULL,
+        account_id VARCHAR(50) NOT NULL,
+        year int NOT NULL,
+        tasted boolean NOT NULL,
+        rating int NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS lineup (
+        beer_id VARCHAR(50) NOT NULL
+    );
+
+select * from accounts;
+select * from beers;
+select * from tastings;
+select * from tastings order by rand();
+*/
