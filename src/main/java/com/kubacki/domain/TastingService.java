@@ -52,6 +52,16 @@ public class TastingService {
         return getTastingsListMap(tastingLineup);
     }
 
+    //TODO: Something's missing about year? maybe?
+    public void tastedBeer(Beer beer) {
+        Beer foundBeer = repo.findBeer(beer);
+        if(foundBeer == null) {
+            throw new IllegalStateException("could not find beer");
+        }
+        repo.removeFromLineup(foundBeer);
+        repo.beerTasted(foundBeer);
+    }
+
     private Map<Beer, List<Account>> getTastingsListMap(List<Tasting> allTastings) {
         Map<Beer, List<Account>> tastings = new HashMap<Beer, List<Account>>();
         for (Tasting tasting : allTastings) {
@@ -75,4 +85,5 @@ public class TastingService {
         repo.updateLineup(beerLineup);
         return beerLineup;
     }
+
 }

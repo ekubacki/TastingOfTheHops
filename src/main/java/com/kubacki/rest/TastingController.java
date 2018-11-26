@@ -3,6 +3,7 @@ package com.kubacki.rest;
 import com.kubacki.domain.Account;
 import com.kubacki.domain.Beer;
 import com.kubacki.domain.TastingService;
+import com.kubacki.rest.request.BeerRequest;
 import com.kubacki.rest.response.BaseResponse;
 import com.kubacki.rest.response.TastingsResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +35,19 @@ public class TastingController {
         return createTastingsResponse(tastingLineup);
     }
 
+    @RequestMapping(value="/tasted", method = RequestMethod.POST)
+    public BaseResponse beerTasted(BeerRequest request) {
+
+        BaseResponse response = new BaseResponse();
+        try {
+            service.tastedBeer(new Beer(request.getName(), request.getBrewery()));
+        } catch (IllegalStateException e) {
+            response.setCode(404);
+            response.setPayload(e.getMessage());
+        }
+        return response;
+    }
+
     private TastingsResponse createTastingsResponse(Map<Beer, List<Account>> allTastings) {
         TastingsResponse tastingsResposne = new TastingsResponse();
         for (Map.Entry<Beer, List<Account>> entry : allTastings.entrySet()) {
@@ -52,4 +66,5 @@ public class TastingController {
         }
         return tastingsResposne;
     }
+
 }

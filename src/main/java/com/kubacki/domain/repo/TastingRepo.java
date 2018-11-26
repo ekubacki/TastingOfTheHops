@@ -33,6 +33,8 @@ public class TastingRepo extends JdbcTemplate {
     private static final String GET_RANDOM_TASTINGS = "select beer_id from tastings where tasted = false and year = ? order by rand() limit ?";
     private static final String GET_TASTINGS_FOR_BEER = "select * from tastings where beer_id = ?";
     private static final String DELETE_ALL_LINEUPS = "delete from lineup";
+    private static final String UPDATE_TASTINGS_TASTED = "update tastings set tasted = true where beer_id = ?";
+    private static final String DELETE_LINEUP = "delete from lineup where beer_id = ?";
 
     @Autowired
     public TastingRepo(DataSource dataSource) {
@@ -118,6 +120,16 @@ public class TastingRepo extends JdbcTemplate {
             tastings.addAll(this.query(GET_TASTINGS_FOR_BEER, params, new TastingMapper()));
         }
         return tastings;
+    }
+
+    public void beerTasted(Beer foundBeer) {
+        Object[] params = new Object[] {foundBeer.getId()};
+        this.update(UPDATE_TASTINGS_TASTED, params);
+    }
+
+    public void removeFromLineup(Beer foundBeer) {
+        Object[] params = new Object[] {foundBeer.getId()};
+        this.update(DELETE_LINEUP, params);
     }
 
     public static class AccountMapper implements RowMapper<Account> {

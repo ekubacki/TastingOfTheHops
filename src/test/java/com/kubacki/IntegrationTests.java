@@ -9,6 +9,7 @@ import com.kubacki.rest.request.AccountRequest;
 import com.kubacki.rest.request.BeerRequest;
 import com.kubacki.rest.request.FindAccountRequest;
 import com.kubacki.rest.response.AccountCreateResponse;
+import com.kubacki.rest.response.BaseResponse;
 import com.kubacki.rest.response.FoundAccountResponse;
 import com.kubacki.rest.response.TastingsResponse;
 import org.junit.After;
@@ -22,10 +23,9 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 import java.util.ArrayList;
+import java.util.List;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.springframework.test.util.AssertionErrors.fail;
@@ -510,11 +510,61 @@ public class IntegrationTests {
         assertThat(tastingController.getTastingsLineup().getTastingsResponse().size(), is(equalTo(1)));
     }
 
-    @Ignore
     @Test
-    public void testGetTastingLineup_forTastingsThatHaveBeenTasted_shouldNotReturnThem() {
-        //this should make me build a "tasted" api;
-        fail("Not sure how to test ... .haha");
+    public void testBeerTasted_thatIsNotFound_shouldReturn404() {
+        BeerRequest request = new BeerRequest() {{
+            setName(BEER_NAME);
+            setBrewery(BEER_BREWERY);
+        }};
+        BaseResponse response = tastingController.beerTasted(request);
+
+        assertThat(response.getCode(), is(equalTo(404)));
+        assertThat(response.getPayload(), is(equalTo("could not find beer")));
+    }
+
+    @Test
+    public void testBeerTasted_shouldUpdateTastingLineup() {
+        accountController.create(buildValidRequestWithABeerForUser(FIRST_NAME, LAST_NAME,
+                EMAIL, BEER_NAME, BEER_BREWERY));
+        accountController.create(buildValidRequestWithABeerForUser(FIRST_NAME + "_2", LAST_NAME + "_2",
+                EMAIL + "_2", BEER_NAME + "_2", BEER_BREWERY + "_2"));
+        accountController.create(buildValidRequestWithABeerForUser(FIRST_NAME + "_3", LAST_NAME + "_3",
+                EMAIL + "_3", BEER_NAME + "_3", BEER_BREWERY + "_3"));
+        accountController.create(buildValidRequestWithABeerForUser(FIRST_NAME + "_4", LAST_NAME + "_4",
+                EMAIL + "_4", BEER_NAME + "_4", BEER_BREWERY + "_4"));
+        tastingController.getTastingsLineup();
+
+        BeerRequest request = new BeerRequest() {{
+            setName(BEER_NAME);
+            setBrewery(BEER_BREWERY);
+        }};
+
+        tastingController.beerTasted(request);
+        TastingsResponse tastingsLineup = tastingController.getTastingsLineup();
+        assertThat(tastingsLineup.getTastingsResponse().size() , is(equalTo(3)));
+        assertThat(tastingsLineup.getTastingsResponse().get(0).getBeerName(), is(not(equalTo(BEER_NAME))));
+        assertThat(tastingsLineup.getTastingsResponse().get(1).getBeerName(), is(not(equalTo(BEER_NAME))));
+        assertThat(tastingsLineup.getTastingsResponse().get(2).getBeerName(), is(not(equalTo(BEER_NAME))));
+
+    }
+
+    /**
+     * This is a helper method that helps with debugging.
+     * @param tastingsLineup
+     */
+    private void printLineup(TastingsResponse tastingsLineup) {
+        List<TastingsResponse.TastingResponse> tastingsResponse = tastingsLineup.getTastingsResponse();
+
+        for(TastingsResponse.TastingResponse tasting : tastingsLineup.getTastingsResponse()) {
+            System.out.println("==========================================");
+            System.out.println("Beer Name: " + tasting.getBeerName());
+            System.out.println("Brewery Name: " + tasting.getBrewery());
+            for(String displayName : tasting.getDisplayNames()) {
+                System.out.println("Person who brought the beer: " + displayName);
+            }
+            System.out.println("==========================================");
+        }
+
     }
 
     @Ignore
