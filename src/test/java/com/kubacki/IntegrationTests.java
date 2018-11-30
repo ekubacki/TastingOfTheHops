@@ -6,6 +6,7 @@ import com.kubacki.domain.Beer;
 import com.kubacki.rest.AccountController;
 import com.kubacki.rest.TastingController;
 import com.kubacki.rest.request.AccountRequest;
+import com.kubacki.rest.request.BeerRateRequest;
 import com.kubacki.rest.request.BeerRequest;
 import com.kubacki.rest.request.FindAccountRequest;
 import com.kubacki.rest.response.AccountCreateResponse;
@@ -14,7 +15,6 @@ import com.kubacki.rest.response.FoundAccountResponse;
 import com.kubacki.rest.response.TastingsResponse;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +28,6 @@ import java.util.List;
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
-import static org.springframework.test.util.AssertionErrors.fail;
 
 
 @WebAppConfiguration
@@ -548,13 +547,149 @@ public class IntegrationTests {
 
     }
 
+    @Test
+    public void testRateBeer_shouldReturnRatingsOnGetTastingsList() {
+        accountController.create(buildValidRequestWithABeerForUser(FIRST_NAME, LAST_NAME,
+                EMAIL, BEER_NAME, BEER_BREWERY));
+
+        BeerRateRequest rateRequest = new BeerRateRequest();
+        rateRequest.setRating(3);
+        rateRequest.setName(BEER_NAME);
+        rateRequest.setBrewery(BEER_BREWERY);
+        rateRequest.setFirstName(FIRST_NAME);
+        rateRequest.setLastName(LAST_NAME);
+        tastingController.rateBeer(rateRequest);
+
+        List<TastingsResponse.TastingResponse> tastingsResponse = tastingController.getTastingList().getTastingsResponse();
+
+        assertThat(tastingsResponse.get(0).getRating(), is(equalTo(3.0)));
+    }
+
+    @Test
+    public void testRateBeer_withSameUserMultipleTime_shouldReturnRatingsForLastGetTastingsList() {
+        accountController.create(buildValidRequestWithABeerForUser(FIRST_NAME, LAST_NAME,
+                EMAIL, BEER_NAME, BEER_BREWERY));
+
+        BeerRateRequest rateRequest = new BeerRateRequest();
+        rateRequest.setRating(3);
+        rateRequest.setName(BEER_NAME);
+        rateRequest.setBrewery(BEER_BREWERY);
+        rateRequest.setFirstName(FIRST_NAME);
+        rateRequest.setLastName(LAST_NAME);
+        tastingController.rateBeer(rateRequest);
+        rateRequest.setRating(2);
+        tastingController.rateBeer(rateRequest);
+        rateRequest.setRating(5);
+        tastingController.rateBeer(rateRequest);
+        List<TastingsResponse.TastingResponse> tastingsResponse = tastingController.getTastingList().getTastingsResponse();
+
+        assertThat(tastingsResponse.get(0).getRating(), is(equalTo(5.0)));
+    }
+
+    @Test
+    public void testRateBeer_withTwoUsers_shouldReturnAvgRatingsForGetTastingsList() {
+        accountController.create(buildValidRequestWithABeerForUser(FIRST_NAME, LAST_NAME,
+                EMAIL, BEER_NAME, BEER_BREWERY));
+        accountController.create(buildValidUserRequest(FIRST_NAME + "_2", LAST_NAME + "_2",
+                EMAIL + "_2"));
+
+        BeerRateRequest rateRequest = new BeerRateRequest() {{
+            setRating(3);
+            setName(BEER_NAME);
+            setBrewery(BEER_BREWERY);
+            setFirstName(FIRST_NAME);
+            setLastName(LAST_NAME);
+        }};
+        tastingController.rateBeer(rateRequest);
+
+        BeerRateRequest rateRequest2 = new BeerRateRequest() {{
+            setRating(5);
+            setName(BEER_NAME);
+            setBrewery(BEER_BREWERY);
+            setFirstName(FIRST_NAME + "_2");
+            setLastName(LAST_NAME + "_2");
+        }};
+        tastingController.rateBeer(rateRequest2);
+
+        List<TastingsResponse.TastingResponse> tastingsResponse = tastingController.getTastingList().getTastingsResponse();
+        assertThat(tastingsResponse.get(0).getRating(), is(equalTo(4.0)));
+    }
+
+    @Test
+    public void testRateBeer_withValueLessThan1_shouldThrowException() {
+        accountController.create(buildValidRequestWithABeerForUser(FIRST_NAME, LAST_NAME,
+                EMAIL, BEER_NAME, BEER_BREWERY));
+
+        BeerRateRequest rateRequest = new BeerRateRequest();
+        rateRequest.setRating(0);
+        rateRequest.setName(BEER_NAME);
+        rateRequest.setBrewery(BEER_BREWERY);
+        rateRequest.setFirstName(FIRST_NAME);
+        rateRequest.setLastName(LAST_NAME);
+        BaseResponse response = tastingController.rateBeer(rateRequest);
+
+        assertThat(response.getCode(), is(equalTo(400)));
+        assertThat(response.getPayload(), is(equalTo("Must provide rating between 1 and 5")));
+    }
+
+    @Test
+    public void testRateBeer_withValueGreatherThan5_shouldThrowException() {
+        accountController.create(buildValidRequestWithABeerForUser(FIRST_NAME, LAST_NAME,
+                EMAIL, BEER_NAME, BEER_BREWERY));
+
+        BeerRateRequest rateRequest = new BeerRateRequest();
+        rateRequest.setRating(6);
+        rateRequest.setName(BEER_NAME);
+        rateRequest.setBrewery(BEER_BREWERY);
+        rateRequest.setFirstName(FIRST_NAME);
+        rateRequest.setLastName(LAST_NAME);
+        BaseResponse response = tastingController.rateBeer(rateRequest);
+
+
+        assertThat(response.getCode(), is(equalTo(400)));
+        assertThat(response.getPayload(), is(equalTo("Must provide rating between 1 and 5")));
+    }
+
+    @Test
+    public void testRateBeer_forAccountNotFound_shouldReturn404() {
+        accountController.create(buildValidRequestWithABeerForUser(FIRST_NAME, LAST_NAME,
+                EMAIL, BEER_NAME, BEER_BREWERY));
+
+        BeerRateRequest rateRequest = new BeerRateRequest() {{
+            setRating(3);
+            setName(BEER_NAME);
+            setBrewery(BEER_BREWERY);
+            setFirstName(FIRST_NAME + "_you will never find me");
+            setLastName(LAST_NAME);
+        }};
+        BaseResponse response = tastingController.rateBeer(rateRequest);
+
+        assertThat(response.getPayload(), is(equalTo("This account was not found")));
+        assertThat(response.getCode(), is(equalTo(404)));
+    }
+
+    @Test
+    public void testRateBeer_forBeerNotFound_shouldReturn404() {
+        accountController.create(buildValidRequestWithABeerForUser(FIRST_NAME, LAST_NAME,
+                EMAIL, BEER_NAME, BEER_BREWERY));
+
+        BeerRateRequest rateRequest = new BeerRateRequest();
+        rateRequest.setRating(3);
+        rateRequest.setName(BEER_NAME + "you will never find me!");
+        rateRequest.setBrewery(BEER_BREWERY);
+        rateRequest.setFirstName(FIRST_NAME);
+        rateRequest.setLastName(LAST_NAME);
+        BaseResponse response = tastingController.rateBeer(rateRequest);
+
+        assertThat(response.getPayload(), is(equalTo("This beer was not found")));
+        assertThat(response.getCode(), is(equalTo(404)));
+    }
+
     /**
      * This is a helper method that helps with debugging.
      * @param tastingsLineup
      */
     private void printLineup(TastingsResponse tastingsLineup) {
-        List<TastingsResponse.TastingResponse> tastingsResponse = tastingsLineup.getTastingsResponse();
-
         for(TastingsResponse.TastingResponse tasting : tastingsLineup.getTastingsResponse()) {
             System.out.println("==========================================");
             System.out.println("Beer Name: " + tasting.getBeerName());
@@ -565,12 +700,6 @@ public class IntegrationTests {
             System.out.println("==========================================");
         }
 
-    }
-
-    @Ignore
-    @Test
-    public void testRateBeer() {
-        fail("This is not yet started");
     }
 
     private AccountRequest buildValidUserRequestWithABeer() {

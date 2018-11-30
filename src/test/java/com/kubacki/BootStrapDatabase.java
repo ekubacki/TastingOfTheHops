@@ -14,13 +14,17 @@ public class BootStrapDatabase extends JdbcTemplate {
         + "account_id VARCHAR(50) NOT NULL,"
         + "first_name VARCHAR(50) NOT NULL,"
         + "last_name VARCHAR(50) NOT NULL,"
-        + "email VARCHAR(50)"
+        + "email VARCHAR(50),"
+        + "CONSTRAINT pk_accounts PRIMARY KEY (account_id),"
+        + "UNIQUE KEY accounts_unique_index (first_name, last_name)"
         + ");";
 
     private static final String CREATE_BEERS_TABLE = "CREATE TABLE IF NOT EXISTS beers ("
         + "beer_id VARCHAR(50) NOT NULL,"
         + "name VARCHAR(50) NOT NULL,"
         + "brewery VARCHAR(50) NOT NULL,"
+        + "CONSTRAINT pk_beers PRIMARY KEY (beer_id),"
+        + "UNIQUE KEY beers_unique_index (name, brewery)"
         + ");";
 
     private static final String CREATE_TASTINGS_TABLE = "CREATE TABLE IF NOT EXISTS tastings ("
@@ -35,10 +39,19 @@ public class BootStrapDatabase extends JdbcTemplate {
         + "beer_id VARCHAR(50) NOT NULL"
         + ");";
 
+    private static final String CREATE_RATINGS_TABLE = "CREATE TABLE IF NOT EXISTS ratings ("
+        + "account_id VARCHAR(50) NOT NULL,"
+        + "beer_id VARCHAR(50) NOT NULL,"
+        + "year int NOT NULL,"
+        + "rating int NOT NULL,"
+        + "CONSTRAINT pk_ratings PRIMARY KEY (account_id, beer_id, year)"
+        + ");";
+
     private static final String DROP_ACCOUNTS_TABLE = "DROP TABLE accounts";
     private static final String DROP_BEERS_TABLE = "DROP TABLE beers";
     private static final String DROP_TASTINGS_TABLE = "DROP TABLE tastings";
     private static final String DROP_LINEUP_TABLE = "DROP TABLE lineup";
+    private static final String DROP_RATINGS_TABLE = "DROP TABLE ratings";
 
     private static final String ACCOUNT_INSERT_SQL = "Insert into ACCOUNTS (account_id,first_name,last_name, email) "//
             + " values (?,?,?,?)";
@@ -56,6 +69,7 @@ public class BootStrapDatabase extends JdbcTemplate {
         this.update(CREATE_BEERS_TABLE);
         this.update(CREATE_TASTINGS_TABLE);
         this.update(CREATE_LINEUP_TABLE);
+        this.update(CREATE_RATINGS_TABLE);
     }
 
     public void tearDownTables() {
@@ -63,6 +77,7 @@ public class BootStrapDatabase extends JdbcTemplate {
         this.update(DROP_BEERS_TABLE);
         this.update(DROP_TASTINGS_TABLE);
         this.update(DROP_LINEUP_TABLE);
+        this.update(DROP_RATINGS_TABLE);
     }
 
     public void createAccount() {

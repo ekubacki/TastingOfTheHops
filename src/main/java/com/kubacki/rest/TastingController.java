@@ -3,6 +3,7 @@ package com.kubacki.rest;
 import com.kubacki.domain.Account;
 import com.kubacki.domain.Beer;
 import com.kubacki.domain.TastingService;
+import com.kubacki.rest.request.BeerRateRequest;
 import com.kubacki.rest.request.BeerRequest;
 import com.kubacki.rest.response.BaseResponse;
 import com.kubacki.rest.response.TastingsResponse;
@@ -19,8 +20,22 @@ public class TastingController {
     private TastingService service;
 
     @RequestMapping(value = "/rate", method = RequestMethod.POST)
-    public BaseResponse rate() {
-        throw new UnsupportedOperationException("I haven't completed this yet");
+    public BaseResponse rateBeer(BeerRateRequest rateRequest) {
+        BaseResponse response = new BaseResponse();
+        try {
+            service.rateBeer(
+                    new Account(rateRequest.getFirstName(), rateRequest.getLastName()),
+                    new Beer(rateRequest.getName(), rateRequest.getBrewery()),
+                    rateRequest.getRating()
+            );
+        } catch (IllegalArgumentException e) {
+            response.setCode(400);
+            response.setPayload(e.getMessage());
+        } catch (IllegalStateException e) {
+            response.setCode(404);
+            response.setPayload(e.getMessage());
+        }
+        return response;
     }
 
     @RequestMapping(value="/tastings", method = RequestMethod.GET)
@@ -58,6 +73,7 @@ public class TastingController {
 
             tastingResponse.setBeerName(beer.getName());
             tastingResponse.setBrewery(beer.getBrewery());
+            tastingResponse.setRating(beer.getYearlyRating().get(Calendar.getInstance().get(Calendar.YEAR)));
 
             for (Account account : accountsThatBroughtBeer) {
                 tastingResponse.addDisplayNames(account.getDisplayName());

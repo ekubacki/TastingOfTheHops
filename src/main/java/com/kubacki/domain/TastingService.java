@@ -53,6 +53,8 @@ public class TastingService {
     }
 
     //TODO: Something's missing about year? maybe?
+    //After thinking about it if a beer was not tasted the previous year then this will carpet bomb for the previous
+    //years as well?  maybe that's ok?
     public void tastedBeer(Beer beer) {
         Beer foundBeer = repo.findBeer(beer);
         if(foundBeer == null) {
@@ -68,7 +70,8 @@ public class TastingService {
             Account account = repo.getAccount(tasting.getAccountId());
 
             Beer beer = repo.getBeer(tasting.getBeerId());
-
+            Double rating = repo.getBeerRatingByYear(beer, Calendar.getInstance().get(Calendar.YEAR));
+            beer.setYearlyRating(new HashMap<Integer, Double>() {{put(Calendar.getInstance().get(Calendar.YEAR), rating);}});
             List<Account> accounts = tastings.get(beer);
             if (accounts == null || accounts.isEmpty()) {
                 tastings.put(beer, new ArrayList<Account>() {{ add(account); }});
@@ -86,4 +89,18 @@ public class TastingService {
         return beerLineup;
     }
 
+    public void rateBeer(Account account, Beer beer, int rating) {
+        if (rating < 1 || rating > 5) {
+            throw new IllegalArgumentException("Must provide rating between 1 and 5");
+        }
+        Account foundAccount = repo.findAccount(account.getFirstName(), account.getLastName(), account.getEmail());
+        if (foundAccount == null) {
+            throw new IllegalStateException("This account was not found");
+        }
+        Beer foundBeer = repo.findBeer(beer);
+        if (foundBeer == null) {
+            throw new IllegalStateException("This beer was not found");
+        }
+        repo.addRating(foundAccount, foundBeer, Calendar.getInstance().get(Calendar.YEAR), rating);
+    }
 }

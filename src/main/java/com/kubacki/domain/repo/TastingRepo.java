@@ -21,8 +21,10 @@ public class TastingRepo extends JdbcTemplate {
             + " values (?,?,?)";
     private static final String TASTING_INSERT_SQL = "Insert into TASTINGS (beer_id, account_id, year, tasted, rating) "
             + " values(?,?,?,?,?)";
-    private static final String INSERT_LINEUP = "Insert into lineup (beer_id) "
+    private static final String LINEUP_INSERT_SQL = "Insert into lineup (beer_id) "
             + " values(?)";
+    private static final String RATING_INSERT_SQL = "Replace into ratings (beer_id, account_id, year, rating) "
+            + " values(?, ?, ?, ?)";
 
     private static final String FIND_ACCOUNT = "select * from accounts where email = ? or first_name = ? and last_name = ?";
     private static final String GET_ACCOUNT = "select * from accounts where account_id = ?";
@@ -35,6 +37,7 @@ public class TastingRepo extends JdbcTemplate {
     private static final String DELETE_ALL_LINEUPS = "delete from lineup";
     private static final String UPDATE_TASTINGS_TASTED = "update tastings set tasted = true where beer_id = ?";
     private static final String DELETE_LINEUP = "delete from lineup where beer_id = ?";
+    private static final String GET_BEER_RATING_BY_YEAR = "select avg(cast(rating as Float)) from ratings  where beer_id = ? and year = ?";
 
     @Autowired
     public TastingRepo(DataSource dataSource) {
@@ -109,7 +112,7 @@ public class TastingRepo extends JdbcTemplate {
         this.update(DELETE_ALL_LINEUPS);
         for(String beerId : beerLineup) {
             Object[] params = new Object[] {beerId};
-            this.update(INSERT_LINEUP, params);
+            this.update(LINEUP_INSERT_SQL, params);
         }
     }
 
@@ -130,6 +133,16 @@ public class TastingRepo extends JdbcTemplate {
     public void removeFromLineup(Beer foundBeer) {
         Object[] params = new Object[] {foundBeer.getId()};
         this.update(DELETE_LINEUP, params);
+    }
+
+    public void addRating(Account account, Beer beer, int year, int rating) {
+        Object[] params = new Object[] { beer.getId(), account.getId(), year, rating};
+        this.update(RATING_INSERT_SQL, params);
+    }
+
+    public Double getBeerRatingByYear(Beer beer, int year) {
+        Object[] params = new Object[] {beer.getId(), year};
+        return this.queryForObject(GET_BEER_RATING_BY_YEAR, params, Double.class);
     }
 
     public static class AccountMapper implements RowMapper<Account> {

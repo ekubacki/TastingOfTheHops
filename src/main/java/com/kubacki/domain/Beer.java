@@ -2,14 +2,15 @@ package com.kubacki.domain;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
 public class Beer {
     private String name;
     private String brewery;
-
     private String id;
+    private transient Map<Integer, Double> yearlyRating;
 
     public Beer(String name, String brewery) {
         this.id = UUID.randomUUID().toString();
@@ -31,6 +32,14 @@ public class Beer {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public Map<Integer, Double> getYearlyRating() {
+        return yearlyRating;
+    }
+
+    public void setYearlyRating(Map<Integer, Double> yearlyRating) {
+        this.yearlyRating = yearlyRating;
     }
 
     @Override

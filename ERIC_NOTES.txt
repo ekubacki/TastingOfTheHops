@@ -104,19 +104,25 @@ year : int
 drop table accounts;
 drop table beers;
 drop table tastings;
+drop table lineup;
+drop table ratings;
 
 
     CREATE TABLE IF NOT EXISTS accounts (
         account_id VARCHAR(50) NOT NULL,
         first_name VARCHAR(50) NOT NULL,
         last_name VARCHAR(50) NOT NULL,
-        email VARCHAR(50),                    //need to figure out  if email is null don't trip find on this.
+        email VARCHAR(50),
+        CONSTRAINT pk_accounts PRIMARY KEY (account_id),
+        UNIQUE KEY accounts_unique_index (first_name, last_name)
     );
 
     CREATE TABLE IF NOT EXISTS beers (
         beer_id VARCHAR(50) NOT NULL,
         name VARCHAR(50) NOT NULL,
         brewery VARCHAR(50) NOT NULL,
+        CONSTRAINT pk_beers PRIMARY KEY (beer_id),
+        UNIQUE KEY beers_unique_index (name, brewery)
     );
 
     CREATE TABLE IF NOT EXISTS tastings (
@@ -128,11 +134,25 @@ drop table tastings;
     );
 
     CREATE TABLE IF NOT EXISTS lineup (
-        beer_id VARCHAR(50) NOT NULL
+        beer_id VARCHAR(50) NOT NULL       // this really should be declared as a foreign key
+    );
+
+    CREATE TABLE IF NOT EXISTS ratings (
+        account_id VARCHAR(50) NOT NULL,
+        beer_id VARCHAR(50) NOT NULL,
+        year int NOT NULL,
+        rating int NOT NULL,
+        CONSTRAINT pk_ratings PRIMARY KEY (account_id, beer_id, year)
     );
 
 select * from accounts;
 select * from beers;
 select * from tastings;
+select * from ratings;
 select * from tastings order by rand();
+select avg(cast(rating as Float)) from ratings  where beer_id = ? and year = ?
 */
+
+
+
+// go look at this: https://www.npmjs.com/package/beeradvocate-api

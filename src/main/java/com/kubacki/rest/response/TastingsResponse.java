@@ -19,6 +19,7 @@ public class TastingsResponse extends BaseResponse {
         List<String> displayNames = new ArrayList<>();
         String beerName;
         String brewery;
+        Double rating;
 
         public List<String> getDisplayNames() {
             return displayNames;
@@ -42,6 +43,14 @@ public class TastingsResponse extends BaseResponse {
 
         public void setBrewery(String brewery) {
             this.brewery = brewery;
+        }
+
+        public Double getRating() {
+            return rating;
+        }
+
+        public void setRating(Double rating) {
+            this.rating = rating;
         }
     }
 }
