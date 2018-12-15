@@ -80,6 +80,7 @@ public class TastingController {
             }
             tastingsResposne.addTastingResponse(tastingResponse);
         }
+        tastingsResposne.setCode(200);
         return tastingsResposne;
     }
 

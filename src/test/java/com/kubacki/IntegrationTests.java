@@ -323,6 +323,7 @@ public class IntegrationTests {
         TastingsResponse tastingsResponse = tastingController.getTastingList();
 
         assertThat(tastingsResponse.getTastingsResponse().size() , is(equalTo(1)));
+        assertThat(tastingsResponse.getCode(), is(equalTo(200)));
         TastingsResponse.TastingResponse tastingResponse = tastingsResponse.getTastingsResponse().get(0);
 
 
