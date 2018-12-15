@@ -376,6 +376,7 @@ public class IntegrationTests {
         assertThat(tastingsLineup.getTastingsResponse().get(0).getDisplayNames().size(), is(equalTo(1)));
         assertThat(tastingsLineup.getTastingsResponse().get(1).getDisplayNames().size(), is(equalTo(1)));
         assertThat(tastingsLineup.getTastingsResponse().get(2).getDisplayNames().size(), is(equalTo(1)));
+        assertThat(tastingsLineup.getCode(), is(equalTo(200)));
     }
 
     @Test
