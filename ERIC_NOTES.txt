@@ -2,6 +2,8 @@
 
 ======================================================================
 //sign-up
+HTTP-Verb: POST
+content-type : application/json
 
 http://localhost:8080/TastingOfTheHops/account/signup
 
@@ -62,18 +64,52 @@ Example Error Responses:
     "payload": "Must have a value for beer"
 }
 ======================================================================
+//find user
+HTTP-Verb: POST
+content-type : application/json
 
+http://localhost:8080/TastingOfTheHops/account/find
 
-
-
-
-
-/rest/user/look-up
+Example Request Json:
 {
-	"firstName": "Eric",
-    "lastName" : "Kubacki"
+  "firstName": "Eric",
+  "lastName" : "Kubacki"
 }
-return: {"userId" : "stringValue"}
+{
+  "email": "ejkubacki@gmail.com"
+}
+{
+  "firstName": "Eric",
+  "lastName" : "Kubacki",
+  "email": "ejkubacki@gmail.com"
+}
+
+Example Request Json:
+{
+    "code": 200,
+    "firstName": "Eric",
+    "lastName": "Kubacki",
+    "email": "ejkubacki@gmail.com",
+    "id": "80a1f0a9-c07d-451d-91d1-d804501ac646",
+    "payload": null
+}
+{
+    "code": 404,
+    "firstName": null,
+    "lastName": null,
+    "email": null,
+    "id": null,
+    "payload": "The account was not found"
+}
+
+Example Error Responses:
+
+
+
+
+
+
+
 
 
 //next-up    ->> Need to add "display-name" to this.
