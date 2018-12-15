@@ -1,22 +1,72 @@
 /*
 
-
+======================================================================
 //sign-up
 
-/rest/user/sign-up
+http://localhost:8080/TastingOfTheHops/account/signup
+
+Example Request Json:
+{
+  "firstName": "Eric",
+  "lastName" : "Kubacki"
+}
+
 {
   "firstName": "Eric",
   "lastName" : "Kubacki",
   "email" : "ejkubacki@gmail.com",
 
   "beers" : [
-  	"beer": {
+    {
       "name" : "The Good Stuff",
       "brewery" : "This is a test brewery"
+	}, {
+		"name" : "The Good Stuff part 2",
+		"brewery" : "this is a test brewery"
 	}
   ]
 }
-return: {"userId": "stringValue"}
+
+Example Request Json:
+{
+    "code": 200,
+    "accountId": "80a1f0a9-c07d-451d-91d1-d804501ac646",
+    "payload": null
+}
+
+
+Example Error Responses:
+{
+    "code": 409,
+    "accountId": null,
+    "payload": "This account already exists: Eric Kubacki"
+}
+{
+    "code": 400,
+    "accountId": null,
+    "payload": "Must have a value for first name"
+}
+{
+    "code": 400,
+    "accountId": null,
+    "payload": "Must have a value for last name"
+}
+{
+    "code": 400,
+    "accountId": null,
+    "payload": "Must have a value for brewery"
+}
+{
+    "code": 400,
+    "accountId": null,
+    "payload": "Must have a value for beer"
+}
+======================================================================
+
+
+
+
+
 
 /rest/user/look-up
 {
