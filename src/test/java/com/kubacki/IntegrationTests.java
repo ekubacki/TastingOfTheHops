@@ -175,6 +175,7 @@ public class IntegrationTests {
         assertThat(response.getFirstName(), is(equalTo(FIRST_NAME)));
         assertThat(response.getLastName(), is(equalTo(LAST_NAME)));
         assertThat(response.getEmail(), is(nullValue()));
+        assertThat(response.getCode(), is(equalTo(200)));
     }
 
     @Test

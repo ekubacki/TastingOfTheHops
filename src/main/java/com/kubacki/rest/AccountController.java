@@ -67,6 +67,7 @@ public class AccountController {
         response.setFirstName(account.getFirstName());
         response.setLastName(account.getLastName());
         response.setEmail(account.getEmail());
+        response.setCode(200);
         return response;
     }
 }
