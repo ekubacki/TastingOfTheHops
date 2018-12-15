@@ -29,7 +29,7 @@ Example Request Json:
   ]
 }
 
-Example Request Json:
+Example Response Json:
 {
     "code": 200,
     "accountId": "80a1f0a9-c07d-451d-91d1-d804501ac646",
@@ -84,7 +84,7 @@ Example Request Json:
   "email": "ejkubacki@gmail.com"
 }
 
-Example Request Json:
+Example Response Json:
 {
     "code": 200,
     "firstName": "Eric",
@@ -103,11 +103,70 @@ Example Request Json:
 }
 
 ======================================================================
+//get tastings
+HTTP-Verb: POST
+content-type : application/json
+
+http://localhost:8080/TastingOfTheHops/tasting/tastings
+
+Example Response Json:
+{
+    "code": 200,
+    "tastingsResponse": [
+        {
+            "displayNames": [
+                "Eric Kubacki"
+            ],
+            "beerName": "The Good Stuff",
+            "brewery": "This is a test brewery",
+            "rating": null
+        },
+        {
+            "displayNames": [
+                "Eric Kubacki"
+            ],
+            "beerName": "The Good Stuff part 2",
+            "brewery": "this is a test brewery",
+            "rating": null
+        }
+    ],
+    "payload": null
+}
 
 
 
 
+======================================================================
+//get tasting lineup
+HTTP-Verb: POST
+content-type : application/json
 
+http://localhost:8080/TastingOfTheHops/tasting/lineup
+
+Example Response Json:
+{
+    "code": 200,
+    "tastingsResponse": [
+        {
+            "displayNames": [
+                "Eric Kubacki"
+            ],
+            "beerName": "The Good Stuff",
+            "brewery": "This is a test brewery",
+            "rating": null
+        },
+        {
+            "displayNames": [
+                "Eric Kubacki"
+            ],
+            "beerName": "The Good Stuff part 2",
+            "brewery": "this is a test brewery",
+            "rating": null
+        }
+    ],
+    "payload": null
+}
+======================================================================
 
 
 
@@ -167,3 +226,6 @@ select avg(cast(rating as Float)) from ratings  where beer_id = ? and year = ?
 
 
 // go look at this: https://www.npmjs.com/package/beeradvocate-api
+// need to add an api that if a user is found and they are only adding a beer
+// create api to "find" a beer -> look at integrating this with beeradvocate-api
+// determine agreement about character case senstivity
