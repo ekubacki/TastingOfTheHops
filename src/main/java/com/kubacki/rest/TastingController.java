@@ -20,7 +20,7 @@ public class TastingController {
     private TastingService service;
 
     @RequestMapping(value = "/rate", method = RequestMethod.POST)
-    public BaseResponse rateBeer(BeerRateRequest rateRequest) {
+    public BaseResponse rateBeer(@RequestBody BeerRateRequest rateRequest) {
         BaseResponse response = new BaseResponse();
         try {
             service.rateBeer(

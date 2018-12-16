@@ -1,5 +1,7 @@
 package com.kubacki.rest.request;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
 public class BeerRateRequest extends BeerRequest {
     private String firstName;
     private String lastName;
@@ -27,5 +29,16 @@ public class BeerRateRequest extends BeerRequest {
 
     public void setRating(int rating) {
         this.rating = rating;
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this).
+                append("firstName", firstName).
+                append("lastName", lastName).
+                append("rating", rating).
+                append("beer name", getName()).
+                append("beer brewery", getBrewery()).
+                toString();
     }
 }

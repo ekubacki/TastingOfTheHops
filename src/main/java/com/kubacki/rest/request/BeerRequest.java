@@ -2,8 +2,8 @@ package com.kubacki.rest.request;
 
 public class BeerRequest {
 
-    private String name = "";
-    private String brewery = "";
+    private String name;
+    private String brewery;
 
     public String getName() {
         return name;
