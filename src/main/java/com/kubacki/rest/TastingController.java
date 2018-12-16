@@ -28,6 +28,7 @@ public class TastingController {
                     new Beer(rateRequest.getName(), rateRequest.getBrewery()),
                     rateRequest.getRating()
             );
+            response.setCode(200);
         } catch (IllegalArgumentException e) {
             response.setCode(400);
             response.setPayload(e.getMessage());

@@ -561,11 +561,13 @@ public class IntegrationTests {
         rateRequest.setBrewery(BEER_BREWERY);
         rateRequest.setFirstName(FIRST_NAME);
         rateRequest.setLastName(LAST_NAME);
-        tastingController.rateBeer(rateRequest);
+        BaseResponse response = tastingController.rateBeer(rateRequest);
 
         List<TastingsResponse.TastingResponse> tastingsResponse = tastingController.getTastingList().getTastingsResponse();
 
+        assertThat(response.getCode(), is(equalTo(200)));
         assertThat(tastingsResponse.get(0).getRating(), is(equalTo(3.0)));
+
     }
 
     @Test
