@@ -9,6 +9,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import javax.sql.DataSource;
+import org.apache.log4j.Logger;
 
 @Configuration
 @EnableWebMvc
@@ -19,29 +20,31 @@ public class ApplicationConfiguration {
     @Autowired
     private Environment env;
 
+    private static final Logger log = Logger.getLogger(ApplicationConfiguration.class);
+
     @Bean(name = "dataSource")
     public DataSource getDataSource() {
         BasicDataSource dataSource = new BasicDataSource();
 
         dataSource.setDriverClassName(env.getProperty("db.database-driver"));
-        System.out.println("## Database URL IS : " + env.getProperty("db.url"));
+        log.info("## Database URL IS : " + env.getProperty("db.url"));
         dataSource.setUrl(env.getProperty("db.url"));
         dataSource.setUsername(env.getProperty("db.username"));
         dataSource.setPassword(env.getProperty("db.password"));
 
-        System.out.println("## getDataSource: " + dataSource);
+        log.info("## getDataSource: " + dataSource);
         return dataSource;
     }
 
     @Bean(name = "tastingService")
     public TastingService getTastingService() {
-        System.out.println("## tastingService created");
+        log.info("## tastingService created");
         return new TastingService();
     }
 
     @Bean(name = "tastingRepo")
     public TastingRepo getTastingRepo() {
-        System.out.println("## tastingRepo created");
+        log.info("## tastingRepo created");
         return new TastingRepo(getDataSource());
     }
 }

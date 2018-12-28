@@ -4,7 +4,7 @@ public class Tasting {
     private String accountId;
     private String beerId;
     private int year;
-    private boolean tasted = false; //question is should this be here or on beer;
+    private boolean tasted = false;
     private int rating = -1;
 
     public Tasting(String accountId, String beerId, int year) {

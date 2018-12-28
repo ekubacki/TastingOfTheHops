@@ -2,13 +2,11 @@ package com.kubacki.domain;
 
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.Objects;
 import java.util.UUID;
 
 public class Account {
 
     private String id;
-    //TODO: Need to lowercase and uppercase first char in the right spots.
     private String firstName;
     private String lastName;
     private String displayName;

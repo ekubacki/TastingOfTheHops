@@ -22,6 +22,7 @@
 
     <javax.servlet>3.1.0</javax.servlet>
     <jackson.library>2.7.5</jackson.library>
+    <log4j.version>1.2.17</log4j.version>
 
     <h2.database>1.4.197</h2.database>
     <commons-dbcp>1.2.2</commons-dbcp>
@@ -99,6 +100,12 @@
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
       <version>${apache.string}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+      <version>${log4j.version}</version>
     </dependency>
   </dependencies>
 
