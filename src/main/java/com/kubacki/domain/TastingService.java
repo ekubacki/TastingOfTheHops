@@ -73,7 +73,7 @@ public class TastingService {
             Double rating = repo.getBeerRatingByYear(beer, Calendar.getInstance().get(Calendar.YEAR));
             beer.setYearlyRating(new HashMap<Integer, Double>() {{put(Calendar.getInstance().get(Calendar.YEAR), rating);}});
             List<Account> accounts = tastings.get(beer);
-            if (accounts == null || accounts.isEmpty()) {
+            if (accounts == null) {
                 tastings.put(beer, new ArrayList<Account>() {{ add(account); }});
             } else {
                 accounts.add(account);
