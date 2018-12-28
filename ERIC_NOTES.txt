@@ -175,7 +175,7 @@ http://localhost:8080/TastingOfTheHops/tasting/rate
 
 A rating can be updated by just recalling this api with a different rating value
 
-Example Response Json:
+Example Request Json:
 {
   "firstName": "Amy",                      <req>
   "lastName" : "Kubacki",                  <req>
@@ -208,6 +208,39 @@ Example Response Json:
 }
 
 ======================================================================
+//beer tasted
+HTTP-Verb: POST
+content-type : application/json
+
+http://localhost:8080/TastingOfTheHops/tasting/tasted
+
+Example Request Json:
+{
+  "name" : "The Good Stuff",               <req>
+  "brewery" : "This is a test brewery"     <req>
+}
+
+Example Response Json:
+{
+    "code": 200,
+    "payload": null
+}
+{
+    "code": 400,
+    "payload": "Must have a value for beer"
+}
+{
+    "code": 400,
+    "payload": "Must have a value for brewery"
+}
+{
+    "code": 404,
+    "payload": "could not find beer"
+}
+======================================================================
+
+
+
 /*
 drop table accounts;
 drop table beers;

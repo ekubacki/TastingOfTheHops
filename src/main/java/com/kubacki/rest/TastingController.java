@@ -57,8 +57,8 @@ public class TastingController {
     }
 
     @RequestMapping(value="/tasted", method = RequestMethod.POST)
-    public BaseResponse beerTasted(BeerRequest request) {
-
+    public BaseResponse beerTasted(@RequestBody BeerRequest request) {
+        log.debug(request);
         BaseResponse response = new BaseResponse();
         response.setCode(200);
         try {
@@ -66,6 +66,10 @@ public class TastingController {
         } catch (IllegalStateException e) {
             log.error("The beer was not found: " + request, e);
             response.setCode(404);
+            response.setPayload(e.getMessage());
+        } catch (IllegalArgumentException e) {
+            log.error("handling error: " + request, e);
+            response.setCode(400);
             response.setPayload(e.getMessage());
         }
         return response;

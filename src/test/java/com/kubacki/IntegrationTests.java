@@ -525,6 +525,28 @@ public class IntegrationTests {
     }
 
     @Test
+    public void testBeerTasted_withNoBeerName_shouldReturn400() {
+        BeerRequest request = new BeerRequest() {{
+            setBrewery(BEER_BREWERY);
+        }};
+        BaseResponse response = tastingController.beerTasted(request);
+
+        assertThat(response.getCode(), is(equalTo(400)));
+        assertThat(response.getPayload(), is(equalTo("Must have a value for beer")));
+    }
+
+    @Test
+    public void testBeerTasted_withNoBreweryName_shouldReturn400() {
+        BeerRequest request = new BeerRequest() {{
+            setName(BEER_NAME);
+        }};
+        BaseResponse response = tastingController.beerTasted(request);
+
+        assertThat(response.getCode(), is(equalTo(400)));
+        assertThat(response.getPayload(), is(equalTo("Must have a value for brewery")));
+    }
+
+    @Test
     public void testBeerTasted_shouldUpdateTastingLineup() {
         accountController.create(buildValidRequestWithABeerForUser(FIRST_NAME, LAST_NAME,
                 EMAIL, BEER_NAME, BEER_BREWERY));
