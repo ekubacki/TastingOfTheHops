@@ -7,6 +7,7 @@ import com.kubacki.rest.request.BeerRateRequest;
 import com.kubacki.rest.request.BeerRequest;
 import com.kubacki.rest.response.BaseResponse;
 import com.kubacki.rest.response.TastingsResponse;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,6 +20,8 @@ public class TastingController {
     @Autowired
     private TastingService service;
 
+    private static final Logger log = Logger.getLogger(TastingController.class);
+
     @RequestMapping(value = "/rate", method = RequestMethod.POST)
     public BaseResponse rateBeer(@RequestBody BeerRateRequest rateRequest) {
         BaseResponse response = new BaseResponse();
@@ -30,9 +33,11 @@ public class TastingController {
             );
             response.setCode(200);
         } catch (IllegalArgumentException e) {
+            log.error("handling error", e);
             response.setCode(400);
             response.setPayload(e.getMessage());
         } catch (IllegalStateException e) {
+            log.error("handling error", e);
             response.setCode(404);
             response.setPayload(e.getMessage());
         }
@@ -58,6 +63,7 @@ public class TastingController {
         try {
             service.tastedBeer(new Beer(request.getName(), request.getBrewery()));
         } catch (IllegalStateException e) {
+            log.error("handling error", e);
             response.setCode(404);
             response.setPayload(e.getMessage());
         }

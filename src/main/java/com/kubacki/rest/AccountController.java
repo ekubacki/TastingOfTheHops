@@ -8,6 +8,7 @@ import com.kubacki.rest.request.BeerRequest;
 import com.kubacki.rest.request.FindAccountRequest;
 import com.kubacki.rest.response.AccountCreateResponse;
 import com.kubacki.rest.response.FoundAccountResponse;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,6 +20,8 @@ public class AccountController {
 
     @Autowired
     private TastingService service;
+
+    private static final Logger log = Logger.getLogger(AccountController.class);
 
     @RequestMapping(value = "/signup", method = RequestMethod.POST)
     public AccountCreateResponse create(@RequestBody AccountRequest request) {
@@ -36,10 +39,12 @@ public class AccountController {
                 service.addTasting(createdAccount, createdBeer, Calendar.getInstance().get(Calendar.YEAR));
             }
         } catch (IllegalArgumentException e) {
+            log.error("handling error", e);
             response.setCode(400);
             response.setPayload(e.getMessage());
             return response;
         } catch (IllegalStateException e) {
+            log.error("handling error", e);
             response.setCode(409);
             response.setPayload(e.getMessage());
             return response;
@@ -58,6 +63,7 @@ public class AccountController {
         FoundAccountResponse response = new FoundAccountResponse();
 
         if (account == null) {
+            log.info("account was not found: " + request);
             response.setCode(404);
             response.setPayload("The account was not found");
             return response;

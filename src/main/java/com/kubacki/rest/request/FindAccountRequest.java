@@ -1,5 +1,7 @@
 package com.kubacki.rest.request;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
 public class FindAccountRequest {
     private String firstName;
     private String lastName;
@@ -36,5 +38,15 @@ public class FindAccountRequest {
 
     public void setAccountId(String accountId) {
         this.accountId = accountId;
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this).
+                append("firstName", firstName).
+                append("lastName", lastName).
+                append("email", email).
+                append("account id", accountId).
+                toString();
     }
 }
