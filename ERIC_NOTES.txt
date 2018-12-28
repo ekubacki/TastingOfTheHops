@@ -9,19 +9,19 @@ http://localhost:8080/TastingOfTheHops/account/signup
 
 Example Request Json:
 {
-  "firstName": "Eric",
-  "lastName" : "Kubacki"
+  "firstName": "Eric",                             <req>
+  "lastName" : "Kubacki"                           <req>
 }
 
 {
   "firstName": "Eric",
   "lastName" : "Kubacki",
-  "email" : "ejkubacki@gmail.com",
+  "email" : "ejkubacki@gmail.com",                 <opt>
 
-  "beers" : [
+  "beers" : [                                      <opt>
     {
-      "name" : "The Good Stuff",
-      "brewery" : "This is a test brewery"
+      "name" : "The Good Stuff",                   <req>
+      "brewery" : "This is a test brewery"         <req>
 	}, {
 		"name" : "The Good Stuff part 2",
 		"brewery" : "this is a test brewery"
@@ -167,9 +167,47 @@ Example Response Json:
     "payload": null
 }
 ======================================================================
+//rate beer
+HTTP-Verb: POST
+content-type : application/json
 
+http://localhost:8080/TastingOfTheHops/tasting/rate
 
+A rating can be updated by just recalling this api with a different rating value
 
+Example Response Json:
+{
+  "firstName": "Amy",                      <req>
+  "lastName" : "Kubacki",                  <req>
+  "email" : "Amy.kubacki@gmail.com",       <opt>
+  "rating" : 1,                            <req>
+  "name" : "The Good Stuff",               <req>
+  "brewery" : "This is a test brewery"     <req>
+}
+
+Example Response Json:
+{
+    "code": 200,
+    "payload": null
+}
+{
+    "code": 400,
+    "payload": "Must have a value for first name"
+}
+{
+    "code": 400,
+    "payload": "Must have a value for last name"
+}
+{
+    "code": 400,
+    "payload": "Must provide rating between 1 and 5"
+}
+{
+    "code": 400,
+    "payload": "Must have a value for beer"
+}
+
+======================================================================
 /*
 drop table accounts;
 drop table beers;
