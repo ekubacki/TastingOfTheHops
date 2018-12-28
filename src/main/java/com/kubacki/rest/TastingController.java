@@ -33,11 +33,11 @@ public class TastingController {
             );
             response.setCode(200);
         } catch (IllegalArgumentException e) {
-            log.error("handling error", e);
+            log.error("handling error for request: " + rateRequest, e);
             response.setCode(400);
             response.setPayload(e.getMessage());
         } catch (IllegalStateException e) {
-            log.error("handling error", e);
+            log.error("handling error for request: " + rateRequest, e);
             response.setCode(404);
             response.setPayload(e.getMessage());
         }
