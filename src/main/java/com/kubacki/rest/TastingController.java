@@ -63,7 +63,7 @@ public class TastingController {
         try {
             service.tastedBeer(new Beer(request.getName(), request.getBrewery()));
         } catch (IllegalStateException e) {
-            log.error("handling error", e);
+            log.error("The beer was not found: " + request, e);
             response.setCode(404);
             response.setPayload(e.getMessage());
         }
