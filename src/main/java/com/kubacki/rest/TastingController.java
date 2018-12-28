@@ -60,6 +60,7 @@ public class TastingController {
     public BaseResponse beerTasted(BeerRequest request) {
 
         BaseResponse response = new BaseResponse();
+        response.setCode(200);
         try {
             service.tastedBeer(new Beer(request.getName(), request.getBrewery()));
         } catch (IllegalStateException e) {

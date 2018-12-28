@@ -264,6 +264,7 @@ select avg(cast(rating as Float)) from ratings  where beer_id = ? and year = ?
 
 
 // go look at this: https://www.npmjs.com/package/beeradvocate-api
+// fix response codes https://stackoverflow.com/questions/16232833/how-to-respond-with-http-400-error-in-a-spring-mvc-responsebody-method-returnin
 // need to add an api that if a user is found and they are only adding a beer
 // create api to "find" a beer -> look at integrating this with beeradvocate-api
 // determine agreement about character case senstivity

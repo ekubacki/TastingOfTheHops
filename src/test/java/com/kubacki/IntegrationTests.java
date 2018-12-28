@@ -541,7 +541,8 @@ public class IntegrationTests {
             setBrewery(BEER_BREWERY);
         }};
 
-        tastingController.beerTasted(request);
+        BaseResponse response = tastingController.beerTasted(request);
+        assertThat(response.getCode(), is(equalTo(200)));
         TastingsResponse tastingsLineup = tastingController.getTastingsLineup();
         assertThat(tastingsLineup.getTastingsResponse().size() , is(equalTo(3)));
         assertThat(tastingsLineup.getTastingsResponse().get(0).getBeerName(), is(not(equalTo(BEER_NAME))));
