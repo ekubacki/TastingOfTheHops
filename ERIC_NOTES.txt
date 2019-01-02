@@ -93,6 +93,8 @@ Example Response Json:
     "id": "80a1f0a9-c07d-451d-91d1-d804501ac646",
     "payload": null
 }
+
+Example Error Response:
 {
     "code": 404,
     "firstName": null,
@@ -190,6 +192,8 @@ Example Response Json:
     "code": 200,
     "payload": null
 }
+
+Example Error Responses:
 {
     "code": 400,
     "payload": "Must have a value for first name"
@@ -225,6 +229,8 @@ Example Response Json:
     "code": 200,
     "payload": null
 }
+
+Example Error Responses:
 {
     "code": 400,
     "payload": "Must have a value for beer"
@@ -238,7 +244,46 @@ Example Response Json:
     "payload": "could not find beer"
 }
 ======================================================================
+//sign-up
+HTTP-Verb: POST
+content-type : application/json
 
+http://localhost:8080/TastingOfTheHops/account/beer
+
+Example Request Json:
+{
+  "firstName": "Eric",                             <opt>
+  "lastName" : "Kubacki",                          <opt>
+  "email" : "ejkubacki@gmail.com",                 <opt>
+  "accountId : "some id"                           <opt>
+
+  "beers" : [                                      <req>
+    {
+      "name" : "The Good Stuff",                   <req>
+      "brewery" : "This is a test brewery"         <req>
+	}, {
+		"name" : "The Good Stuff part 2",
+		"brewery" : "this is a test brewery"
+	}
+  ]
+}
+
+Example Response Json:
+{
+    "code": 200,
+    "payload": null
+}
+
+Example Error Responses:
+{
+    "code": 404,
+    "payload": "The account was not found"
+}
+{
+    "code": 400,
+    "payload": "Must add a beer"
+}
+======================================================================
 
 
 /*
