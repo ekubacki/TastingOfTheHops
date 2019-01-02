@@ -4,9 +4,11 @@ import com.kubacki.domain.Account;
 import com.kubacki.domain.Beer;
 import com.kubacki.domain.TastingService;
 import com.kubacki.rest.request.AccountRequest;
+import com.kubacki.rest.request.AddBeerRequest;
 import com.kubacki.rest.request.BeerRequest;
 import com.kubacki.rest.request.FindAccountRequest;
 import com.kubacki.rest.response.AccountCreateResponse;
+import com.kubacki.rest.response.BaseResponse;
 import com.kubacki.rest.response.FoundAccountResponse;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,6 +76,29 @@ public class AccountController {
         response.setLastName(account.getLastName());
         response.setEmail(account.getEmail());
         response.setCode(200);
+        return response;
+    }
+
+    @RequestMapping(value = "/beer", method = RequestMethod.POST)
+    public BaseResponse addBeer(@RequestBody AddBeerRequest request) {
+        BaseResponse response = new BaseResponse();
+        response.setCode(200);
+
+        Account foundAccount = service.findAccount(request.getAccountId(), request.getFirstName(), request.getLastName(), request.getEmail());
+
+        if (foundAccount == null) {
+            log.info("account was not found: " + request);
+            response.setCode(404);
+            response.setPayload("The account was not found");
+            return response;
+        }
+
+        for(BeerRequest beerRequest : request.getBeers()) {
+            Beer beer = new Beer(beerRequest.getName(), beerRequest.getBrewery());
+            String createdBeer = service.addBeer(beer);
+            service.addTasting(foundAccount.getId(), createdBeer, Calendar.getInstance().get(Calendar.YEAR));
+        }
+
         return response;
     }
 }

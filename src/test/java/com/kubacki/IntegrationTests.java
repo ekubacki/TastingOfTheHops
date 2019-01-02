@@ -5,10 +5,7 @@ import javax.sql.DataSource;
 import com.kubacki.domain.Beer;
 import com.kubacki.rest.AccountController;
 import com.kubacki.rest.TastingController;
-import com.kubacki.rest.request.AccountRequest;
-import com.kubacki.rest.request.BeerRateRequest;
-import com.kubacki.rest.request.BeerRequest;
-import com.kubacki.rest.request.FindAccountRequest;
+import com.kubacki.rest.request.*;
 import com.kubacki.rest.response.AccountCreateResponse;
 import com.kubacki.rest.response.BaseResponse;
 import com.kubacki.rest.response.FoundAccountResponse;
@@ -711,6 +708,174 @@ public class IntegrationTests {
 
         assertThat(response.getPayload(), is(equalTo("This beer was not found")));
         assertThat(response.getCode(), is(equalTo(404)));
+    }
+
+    //TODO: This test needs to be cleaned up and refactored
+    @Test
+    public void testAddBeer_withFirstNameLastname_shouldAddBeerAndCreateTasting() {
+        accountController.create(buildValidUserRequest());
+
+        AddBeerRequest request = new AddBeerRequest() {{
+            setFirstName(FIRST_NAME);
+            setLastName(LAST_NAME);
+        }};
+
+        BeerRequest beerOne = new BeerRequest(){{
+            setName(BEER_NAME);
+            setBrewery(BEER_BREWERY);
+        }};
+
+        request.setBeers(new ArrayList<BeerRequest>(){{
+            add(beerOne);
+        }});
+
+        BaseResponse response = accountController.addBeer(request);
+        assertThat(response.getCode(), is(equalTo(200)));
+
+        assertThat(databaseSupport.getBeer(BEER_NAME, BEER_BREWERY), is(notNullValue()));
+
+
+
+        //refactor this to a private method;
+        TastingsResponse tastingsResponse = tastingController.getTastingList();
+
+        assertThat(tastingsResponse.getTastingsResponse().size() , is(equalTo(1)));
+        assertThat(tastingsResponse.getCode(), is(equalTo(200)));
+        TastingsResponse.TastingResponse tastingResponse = tastingsResponse.getTastingsResponse().get(0);
+
+
+        assertThat(tastingResponse.getDisplayNames().size(), is(equalTo(1)));
+        assertThat(tastingResponse.getDisplayNames().get(0), is(equalTo(FIRST_NAME + " " + LAST_NAME)));
+
+        assertThat(tastingResponse.getBeerName(), is(equalTo(BEER_NAME)));
+        assertThat(tastingResponse.getBrewery(), is(equalTo(BEER_BREWERY)));
+    }
+
+    @Test
+    public void testAddBeer_withUserAddingMultipleBeers_shouldAddBeersAndCreateTastings() {
+        accountController.create(buildValidUserRequest());
+
+        AddBeerRequest request = new AddBeerRequest() {{
+            setFirstName(FIRST_NAME);
+            setLastName(LAST_NAME);
+        }};
+
+        BeerRequest beerOne = new BeerRequest(){{
+            setName(BEER_NAME);
+            setBrewery(BEER_BREWERY);
+        }};
+        BeerRequest beerTwo = new BeerRequest(){{
+            setName(BEER_NAME + "_TWO");
+            setBrewery(BEER_BREWERY + "_TWO");
+        }};
+
+        request.setBeers(new ArrayList<BeerRequest>(){{
+            add(beerOne);
+            add(beerTwo);
+        }});
+
+        BaseResponse response = accountController.addBeer(request);
+        assertThat(response.getCode(), is(equalTo(200)));
+
+        assertThat(databaseSupport.getBeer(BEER_NAME, BEER_BREWERY), is(notNullValue()));
+        assertThat(databaseSupport.getBeer(BEER_NAME + "_TWO", BEER_BREWERY + "_TWO"), is(notNullValue()));
+
+        TastingsResponse tastingsResponse = tastingController.getTastingList();
+        assertThat(tastingsResponse.getTastingsResponse().size() , is(equalTo(2)));
+    }
+
+    @Test
+    public void testAddBeer_withUserEmailOnly_shouldAddBeerAndCreateTasting() {
+        accountController.create(buildValidUserRequest());
+        AddBeerRequest request = new AddBeerRequest() {{
+            setEmail(EMAIL);
+        }};
+
+        BeerRequest beerOne = new BeerRequest(){{
+            setName(BEER_NAME);
+            setBrewery(BEER_BREWERY);
+        }};
+
+        request.setBeers(new ArrayList<BeerRequest>(){{
+            add(beerOne);
+        }});
+
+        BaseResponse response = accountController.addBeer(request);
+        assertThat(response.getCode(), is(equalTo(200)));
+
+        assertThat(databaseSupport.getBeer(BEER_NAME, BEER_BREWERY), is(notNullValue()));
+    }
+
+    @Test
+    public void testAddbeer_withUserId_shouldAddBeerAndCreateTasting() {
+        String createdAccountId = accountController.create(buildValidUserRequest()).getAccountId();
+        AddBeerRequest request = new AddBeerRequest() {{
+            setAccountId(createdAccountId);
+        }};
+
+        BeerRequest beerOne = new BeerRequest(){{
+            setName(BEER_NAME);
+            setBrewery(BEER_BREWERY);
+        }};
+
+        request.setBeers(new ArrayList<BeerRequest>(){{
+            add(beerOne);
+        }});
+
+        BaseResponse response = accountController.addBeer(request);
+        assertThat(response.getCode(), is(equalTo(200)));
+
+        assertThat(databaseSupport.getBeer(BEER_NAME, BEER_BREWERY), is(notNullValue()));
+    }
+
+    @Test
+    public void testAddBeer_withUserNotFound_shouldReturn400() {
+        AddBeerRequest request = new AddBeerRequest() {{
+            setFirstName(FIRST_NAME);
+            setLastName(LAST_NAME);
+        }};
+
+        BeerRequest beerOne = new BeerRequest(){{
+            setName(BEER_NAME);
+            setBrewery(BEER_BREWERY);
+        }};
+
+        request.setBeers(new ArrayList<BeerRequest>(){{
+            add(beerOne);
+        }});
+
+        BaseResponse response = accountController.addBeer(request);
+        assertThat(response.getCode(), is(equalTo(404)));
+        assertThat(response.getPayload(), is(equalTo("The account was not found")));
+        assertThat(databaseSupport.getBeer(BEER_NAME, BEER_BREWERY), is(nullValue()));
+    }
+
+    @Test
+    public void testAddBeer_withBeerThatAlreadyExisits_shouldCreateTastingOnly() {
+        accountController.create(buildValidUserRequestWithABeer());
+        accountController.create(
+                buildValidUserRequest(FIRST_NAME + "_2", LAST_NAME + "_2", EMAIL + "2")
+        );
+
+        AddBeerRequest request = new AddBeerRequest() {{
+            setFirstName(FIRST_NAME + "_2");
+            setLastName(LAST_NAME + "_2");
+        }};
+
+        BeerRequest beerOne = new BeerRequest(){{
+            setName(BEER_NAME);
+            setBrewery(BEER_BREWERY);
+        }};
+
+        request.setBeers(new ArrayList<BeerRequest>(){{
+            add(beerOne);
+        }});
+
+        accountController.addBeer(request);
+        assertThat(databaseSupport.getBeer(BEER_NAME, BEER_BREWERY), is(notNullValue()));
+
+        TastingsResponse tastingsResponse = tastingController.getTastingList();
+        assertThat(tastingsResponse.getTastingsResponse().get(0).getDisplayNames().size() , is(equalTo(2)));
     }
 
     /**

@@ -3,6 +3,7 @@ package com.kubacki;
 import com.kubacki.domain.Account;
 import com.kubacki.domain.Beer;
 import com.kubacki.domain.repo.TastingRepo;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import javax.sql.DataSource;
@@ -104,7 +105,11 @@ public class BootStrapDatabase extends JdbcTemplate {
 
     public Beer getBeer(String name, String brewery) {
         Object[] params = new Object[] {name, brewery};
-        return this.queryForObject(GET_BEER, params, new TastingRepo.BeerMapper());
+        try {
+            return this.queryForObject(GET_BEER, params, new TastingRepo.BeerMapper());
+        } catch(EmptyResultDataAccessException e) {
+            return null;
+        }
     }
 
     public void createBeer(String beerId, String beerName, String beerBrewery) {
