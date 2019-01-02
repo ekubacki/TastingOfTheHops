@@ -84,6 +84,13 @@ public class AccountController {
         BaseResponse response = new BaseResponse();
         response.setCode(200);
 
+        if(request.getBeers().size() == 0) {
+            log.info("add beer request was made with no beers: " + request);
+            response.setCode(400);
+            response.setPayload("Must add a beer");
+            return response;
+        }
+
         Account foundAccount = service.findAccount(request.getAccountId(), request.getFirstName(), request.getLastName(), request.getEmail());
 
         if (foundAccount == null) {

@@ -878,6 +878,19 @@ public class IntegrationTests {
         assertThat(tastingsResponse.getTastingsResponse().get(0).getDisplayNames().size() , is(equalTo(2)));
     }
 
+    @Test
+    public void testAddBeer_withNoBeer_shouldReturn400() {
+        accountController.create(buildValidUserRequestWithABeer());
+        AddBeerRequest request = new AddBeerRequest() {{
+            setFirstName(FIRST_NAME);
+            setLastName(LAST_NAME);
+        }};
+
+        BaseResponse response = accountController.addBeer(request);
+        assertThat(response.getCode(), is(equalTo(400)));
+        assertThat(response.getPayload(), is(equalTo("Must add a beer")));
+    }
+
     /**
      * This is a helper method that helps with debugging.
      * @param tastingsLineup
