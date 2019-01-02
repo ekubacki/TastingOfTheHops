@@ -364,6 +364,7 @@ public class IntegrationTests {
                 EMAIL + "_2", BEER_NAME + "_2", BEER_BREWERY + "_2"));
         accountController.create(buildValidRequestWithABeerForUser(FIRST_NAME + "_3", LAST_NAME + "_3",
                 EMAIL + "_3", BEER_NAME + "_3", BEER_BREWERY + "_3"));
+        tastingController.getTastingsLineup();
         accountController.create(buildValidRequestWithABeerForUser(FIRST_NAME + "_4", LAST_NAME + "_4",
                 EMAIL + "_4", BEER_NAME + "_4", BEER_BREWERY + "_4"));
 
