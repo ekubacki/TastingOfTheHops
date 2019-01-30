@@ -61,7 +61,11 @@ public class TastingRepo extends JdbcTemplate {
 
     public Account getAccount(String accountId) {
         Object[] params = new Object[] {accountId};
-        return this.queryForObject(GET_ACCOUNT, params, new AccountMapper());
+        List<Account> accounts = this.query(GET_ACCOUNT, params, new AccountMapper());
+        if(accounts.isEmpty()) {
+            return null;
+        }
+        return accounts.get(0);
     }
 
     public String addBeer(Beer beer) {

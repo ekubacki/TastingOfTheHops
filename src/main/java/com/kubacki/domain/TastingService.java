@@ -1,6 +1,7 @@
 package com.kubacki.domain;
 
 import com.kubacki.domain.repo.TastingRepo;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;
@@ -19,9 +20,15 @@ public class TastingService {
     }
 
     public Account findAccount(String accountId, String firstName, String lastName, String email) {
-        if(accountId != null) {
+        if(!StringUtils.isBlank(accountId)) {
             return repo.getAccount(accountId);
         }
+
+        if(StringUtils.isBlank(email)) {
+            mustNotBeEmpty(firstName, "firstName");
+            mustNotBeEmpty(lastName, "lastName");
+        }
+
         return repo.findAccount(firstName, lastName, email);
     }
 
@@ -102,5 +109,12 @@ public class TastingService {
             throw new IllegalStateException("This beer was not found");
         }
         repo.addRating(foundAccount, foundBeer, Calendar.getInstance().get(Calendar.YEAR), rating);
+    }
+
+    private String mustNotBeEmpty(String value, String type) {
+        if(StringUtils.isBlank(value)) {
+            throw new IllegalArgumentException("Must have a value for " + type);
+        }
+        return value;
     }
 }
