@@ -80,7 +80,6 @@ public class AccountController {
     @RequestMapping(value = "/beer", method = RequestMethod.POST)
     public  ResponseEntity<BaseResponse> addBeer(@RequestBody AddBeerRequest request) {
         BaseResponse response = new BaseResponse();
-        response.setCode(200);
 
         if(request.getBeers().size() == 0) {
             log.info("add beer request was made with no beers: " + request);
