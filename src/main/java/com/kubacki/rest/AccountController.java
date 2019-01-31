@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Calendar;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/account")
 public class AccountController {
