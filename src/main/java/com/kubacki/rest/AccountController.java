@@ -60,24 +60,42 @@ public class AccountController {
 
     @RequestMapping(value = "/find", method = RequestMethod.POST)
     public FoundAccountResponse find(@RequestBody FindAccountRequest request) {
-
-        Account account = service.findAccount(request.getAccountId(), request.getFirstName(),
-                    request.getLastName(), request.getEmail());
         FoundAccountResponse response = new FoundAccountResponse();
+        
+        try {
+            Account account = service.findAccount(request.getAccountId(), request.getFirstName(),
+                        request.getLastName(), request.getEmail());
 
-        if (account == null) {
-            log.info("account was not found: " + request);
-            response.setCode(404);
-            response.setPayload("The account was not found");
+            if (account == null) {
+                log.info("account was not found: " + request);
+                response.setCode(404);
+                response.setPayload("The account was not found");
+                return response;
+            }
+
+            response.setId(account.getId());
+            response.setFirstName(account.getFirstName());
+            response.setLastName(account.getLastName());
+            response.setEmail(account.getEmail());
+            response.setCode(200);
+            return response;
+
+        } catch (IllegalArgumentException e) {
+            log.error("handling error", e);
+            response.setCode(400);
+            response.setPayload(e.getMessage());
+            return response;
+        } catch (IllegalStateException e) {
+            log.error("handling error", e);
+            response.setCode(409);
+            response.setPayload(e.getMessage());
+            return response;
+        } catch (Exception e) {
+            // Catch any kind of unknown exception
+            response.setCode(500);
+            response.setPayload("Internal Server Error");
             return response;
         }
-
-        response.setId(account.getId());
-        response.setFirstName(account.getFirstName());
-        response.setLastName(account.getLastName());
-        response.setEmail(account.getEmail());
-        response.setCode(200);
-        return response;
     }
 
     @RequestMapping(value = "/beer", method = RequestMethod.POST)

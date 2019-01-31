@@ -204,8 +204,36 @@ public class IntegrationTests {
     }
 
     @Test
+    public void testFindUser_withMissingRequiredFirstName_shouldReturn400NotFound() {
+        FindAccountRequest request = new FindAccountRequest();
+
+        FoundAccountResponse response = accountController.find(request);
+        assertThat(response.getId(), is(nullValue()));
+        assertThat(response.getFirstName(), is(nullValue()));
+        assertThat(response.getLastName(), is(nullValue()));
+        assertThat(response.getEmail(), is(nullValue()));
+        assertThat(response.getCode(), is(equalTo(400)));
+        assertThat(response.getPayload(), is(equalTo("Must have a value for firstName")));
+    }
+
+    @Test
+    public void testFindUser_withMissingRequiredLastName_shouldReturn400NotFound() {
+        FindAccountRequest request = new FindAccountRequest();
+        request.setFirstName(FIRST_NAME);
+
+        FoundAccountResponse response = accountController.find(request);
+        assertThat(response.getId(), is(nullValue()));
+        assertThat(response.getFirstName(), is(nullValue()));
+        assertThat(response.getLastName(), is(nullValue()));
+        assertThat(response.getEmail(), is(nullValue()));
+        assertThat(response.getCode(), is(equalTo(400)));
+        assertThat(response.getPayload(), is(equalTo("Must have a value for lastName")));
+    }
+
+    @Test
     public void testFindUser_thatDoesNotExist_shouldReturn404NotFound() {
         FindAccountRequest request = new FindAccountRequest();
+        request.setAccountId("THIS_ACCOUNT_DOES_NOT_EXIST");
 
         FoundAccountResponse response = accountController.find(request);
         assertThat(response.getId(), is(nullValue()));
