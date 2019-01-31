@@ -324,10 +324,11 @@ public class IntegrationTests {
         AccountRequest accountRequest = buildValidUserRequestWithABeer();
 
         accountController.create(accountRequest);
-        TastingsResponse tastingsResponse = tastingController.getTastingList();
+        ResponseEntity<TastingsResponse> rawResponse = tastingController.getTastingList();
+        TastingsResponse tastingsResponse = rawResponse.getBody();
 
         assertThat(tastingsResponse.getTastingsResponse().size() , is(equalTo(1)));
-        assertThat(tastingsResponse.getCode(), is(equalTo(200)));
+        assertThat(rawResponse.getStatusCode(), is(equalTo(HttpStatus.OK)));
         TastingsResponse.TastingResponse tastingResponse = tastingsResponse.getTastingsResponse().get(0);
 
 
@@ -343,7 +344,7 @@ public class IntegrationTests {
         AccountRequest accountRequest = buildValidUserRequestWithTwoBeers();
 
         accountController.create(accountRequest);
-        TastingsResponse tastingsResponse = tastingController.getTastingList();
+        TastingsResponse tastingsResponse = tastingController.getTastingList().getBody();
 
         assertThat(tastingsResponse.getTastingsResponse().size() , is(equalTo(2)));
         assertThat( tastingsResponse.getTastingsResponse().get(0).getDisplayNames().size(), is(equalTo(1)));
@@ -357,7 +358,7 @@ public class IntegrationTests {
         accountController.create(buildValidRequestWithABeerForUser(FIRST_NAME + "_2", LAST_NAME + "_2",
                 EMAIL + "_2", BEER_NAME, BEER_BREWERY));
 
-        TastingsResponse tastingsResponse = tastingController.getTastingList();
+        TastingsResponse tastingsResponse = tastingController.getTastingList().getBody();
 
         assertThat(tastingsResponse.getTastingsResponse().size() , is(equalTo(1)));
         assertThat(tastingsResponse.getTastingsResponse().get(0).getDisplayNames().size(), is(equalTo(2)));
@@ -375,13 +376,14 @@ public class IntegrationTests {
         accountController.create(buildValidRequestWithABeerForUser(FIRST_NAME + "_4", LAST_NAME + "_4",
                 EMAIL + "_4", BEER_NAME + "_4", BEER_BREWERY + "_4"));
 
-        TastingsResponse tastingsLineup = tastingController.getTastingsLineup();
+        ResponseEntity<TastingsResponse> rawResponse = tastingController.getTastingsLineup();
+        TastingsResponse tastingsLineup = rawResponse.getBody();
 
         assertThat(tastingsLineup.getTastingsResponse().size() , is(equalTo(3)));
         assertThat(tastingsLineup.getTastingsResponse().get(0).getDisplayNames().size(), is(equalTo(1)));
         assertThat(tastingsLineup.getTastingsResponse().get(1).getDisplayNames().size(), is(equalTo(1)));
         assertThat(tastingsLineup.getTastingsResponse().get(2).getDisplayNames().size(), is(equalTo(1)));
-        assertThat(tastingsLineup.getCode(), is(equalTo(200)));
+        assertThat(rawResponse.getStatusCode(), is(equalTo(HttpStatus.OK)));
     }
 
     @Test
@@ -389,7 +391,7 @@ public class IntegrationTests {
         accountController.create(buildValidRequestWithABeerForUser(FIRST_NAME, LAST_NAME,
                 EMAIL, BEER_NAME, BEER_BREWERY));
 
-        TastingsResponse tastingsLineup = tastingController.getTastingsLineup();
+        TastingsResponse tastingsLineup = tastingController.getTastingsLineup().getBody();
 
         assertThat(tastingsLineup.getTastingsResponse().size() , is(equalTo(1)));
         assertThat(tastingsLineup.getTastingsResponse().get(0).getDisplayNames().size(), is(equalTo(1)));
@@ -402,7 +404,7 @@ public class IntegrationTests {
         tastingController.getTastingsLineup();
         accountController.create(buildValidRequestWithABeerForUser(FIRST_NAME + "_2", LAST_NAME + "_2",
                 EMAIL + "_2", BEER_NAME + "_2", BEER_BREWERY + "_2"));
-        TastingsResponse tastingsLineup = tastingController.getTastingsLineup();
+        TastingsResponse tastingsLineup = tastingController.getTastingsLineup().getBody();
 
         assertThat(tastingsLineup.getTastingsResponse().size() , is(equalTo(2)));
         assertThat(tastingsLineup.getTastingsResponse().get(0).getDisplayNames().size(), is(equalTo(1)));
@@ -420,7 +422,7 @@ public class IntegrationTests {
 
         accountController.create(buildValidRequestWithABeerForUser(FIRST_NAME + "_3", LAST_NAME + "_3",
                 EMAIL + "_3", BEER_NAME + "_3", BEER_BREWERY + "_3"));
-        TastingsResponse tastingsLineup = tastingController.getTastingsLineup();
+        TastingsResponse tastingsLineup = tastingController.getTastingsLineup().getBody();
 
         assertThat(tastingsLineup.getTastingsResponse().size() , is(equalTo(3)));
         assertThat(tastingsLineup.getTastingsResponse().get(0).getDisplayNames().size(), is(equalTo(1)));
@@ -438,7 +440,7 @@ public class IntegrationTests {
 
         accountController.create(buildValidRequestWithABeerForUser(FIRST_NAME + "_3", LAST_NAME + "_3",
                 EMAIL + "_3", BEER_NAME + "_3", BEER_BREWERY + "_3"));
-        TastingsResponse tastingsLineup = tastingController.getTastingsLineup();
+        TastingsResponse tastingsLineup = tastingController.getTastingsLineup().getBody();
 
         assertThat(tastingsLineup.getTastingsResponse().size() , is(equalTo(3)));
         assertThat(tastingsLineup.getTastingsResponse().get(0).getDisplayNames().size(), is(equalTo(1)));
@@ -476,10 +478,10 @@ public class IntegrationTests {
         }});
 
         accountController.create(request);
-        assertThat(tastingController.getTastingList().getTastingsResponse().size(), is(equalTo(2)));
+        assertThat(tastingController.getTastingList().getBody().getTastingsResponse().size(), is(equalTo(2)));
         Beer beer = databaseSupport.getBeer(BEER_NAME, BEER_BREWERY);
         databaseSupport.updateTastingsYear(beer.getId(), 2017); //this is where we cheat the api
-        assertThat(tastingController.getTastingList().getTastingsResponse().size(), is(equalTo(1)));
+        assertThat(tastingController.getTastingList().getBody().getTastingsResponse().size(), is(equalTo(1)));
     }
     /*
     This is a bit hacky.
@@ -511,10 +513,10 @@ public class IntegrationTests {
         }});
 
         accountController.create(request);
-        assertThat(tastingController.getTastingsLineup().getTastingsResponse().size(), is(equalTo(2)));
+        assertThat(tastingController.getTastingsLineup().getBody().getTastingsResponse().size(), is(equalTo(2)));
         Beer beer = databaseSupport.getBeer(BEER_NAME, BEER_BREWERY);
         databaseSupport.updateTastingsYear(beer.getId(), 2017); //this is where we cheat the api
-        assertThat(tastingController.getTastingsLineup().getTastingsResponse().size(), is(equalTo(1)));
+        assertThat(tastingController.getTastingsLineup().getBody().getTastingsResponse().size(), is(equalTo(1)));
     }
 
     @Test
@@ -523,10 +525,10 @@ public class IntegrationTests {
             setName(BEER_NAME);
             setBrewery(BEER_BREWERY);
         }};
-        BaseResponse response = tastingController.beerTasted(request);
+        ResponseEntity<BaseResponse> response = tastingController.beerTasted(request);
 
-        assertThat(response.getCode(), is(equalTo(404)));
-        assertThat(response.getPayload(), is(equalTo("could not find beer")));
+        assertThat(response.getStatusCode(), is(equalTo(HttpStatus.NOT_FOUND)));
+        assertThat(response.getBody().getPayload(), is(equalTo("could not find beer")));
     }
 
     @Test
@@ -534,10 +536,10 @@ public class IntegrationTests {
         BeerRequest request = new BeerRequest() {{
             setBrewery(BEER_BREWERY);
         }};
-        BaseResponse response = tastingController.beerTasted(request);
+        ResponseEntity<BaseResponse> response = tastingController.beerTasted(request);
 
-        assertThat(response.getCode(), is(equalTo(400)));
-        assertThat(response.getPayload(), is(equalTo("Must have a value for beer")));
+        assertThat(response.getStatusCode(), is(equalTo(HttpStatus.BAD_REQUEST)));
+        assertThat(response.getBody().getPayload(), is(equalTo("Must have a value for beer")));
     }
 
     @Test
@@ -545,10 +547,10 @@ public class IntegrationTests {
         BeerRequest request = new BeerRequest() {{
             setName(BEER_NAME);
         }};
-        BaseResponse response = tastingController.beerTasted(request);
+        ResponseEntity<BaseResponse> response = tastingController.beerTasted(request);
 
-        assertThat(response.getCode(), is(equalTo(400)));
-        assertThat(response.getPayload(), is(equalTo("Must have a value for brewery")));
+        assertThat(response.getStatusCode(), is(equalTo(HttpStatus.BAD_REQUEST)));
+        assertThat(response.getBody().getPayload(), is(equalTo("Must have a value for brewery")));
     }
 
     @Test
@@ -568,9 +570,9 @@ public class IntegrationTests {
             setBrewery(BEER_BREWERY);
         }};
 
-        BaseResponse response = tastingController.beerTasted(request);
-        assertThat(response.getCode(), is(equalTo(200)));
-        TastingsResponse tastingsLineup = tastingController.getTastingsLineup();
+        ResponseEntity<BaseResponse> response = tastingController.beerTasted(request);
+        assertThat(response.getStatusCode(), is(equalTo(HttpStatus.OK)));
+        TastingsResponse tastingsLineup = tastingController.getTastingsLineup().getBody();
         assertThat(tastingsLineup.getTastingsResponse().size() , is(equalTo(3)));
         assertThat(tastingsLineup.getTastingsResponse().get(0).getBeerName(), is(not(equalTo(BEER_NAME))));
         assertThat(tastingsLineup.getTastingsResponse().get(1).getBeerName(), is(not(equalTo(BEER_NAME))));
@@ -589,11 +591,10 @@ public class IntegrationTests {
         rateRequest.setBrewery(BEER_BREWERY);
         rateRequest.setFirstName(FIRST_NAME);
         rateRequest.setLastName(LAST_NAME);
-        BaseResponse response = tastingController.rateBeer(rateRequest);
+        ResponseEntity<BaseResponse> response = tastingController.rateBeer(rateRequest);
+        List<TastingsResponse.TastingResponse> tastingsResponse = tastingController.getTastingList().getBody().getTastingsResponse();
 
-        List<TastingsResponse.TastingResponse> tastingsResponse = tastingController.getTastingList().getTastingsResponse();
-
-        assertThat(response.getCode(), is(equalTo(200)));
+        assertThat(response.getStatusCode(), is(equalTo(HttpStatus.OK)));
         assertThat(tastingsResponse.get(0).getRating(), is(equalTo(3.0)));
 
     }
@@ -614,7 +615,7 @@ public class IntegrationTests {
         tastingController.rateBeer(rateRequest);
         rateRequest.setRating(5);
         tastingController.rateBeer(rateRequest);
-        List<TastingsResponse.TastingResponse> tastingsResponse = tastingController.getTastingList().getTastingsResponse();
+        List<TastingsResponse.TastingResponse> tastingsResponse = tastingController.getTastingList().getBody().getTastingsResponse();
 
         assertThat(tastingsResponse.get(0).getRating(), is(equalTo(5.0)));
     }
@@ -644,7 +645,7 @@ public class IntegrationTests {
         }};
         tastingController.rateBeer(rateRequest2);
 
-        List<TastingsResponse.TastingResponse> tastingsResponse = tastingController.getTastingList().getTastingsResponse();
+        List<TastingsResponse.TastingResponse> tastingsResponse = tastingController.getTastingList().getBody().getTastingsResponse();
         assertThat(tastingsResponse.get(0).getRating(), is(equalTo(4.0)));
     }
 
@@ -659,10 +660,10 @@ public class IntegrationTests {
         rateRequest.setBrewery(BEER_BREWERY);
         rateRequest.setFirstName(FIRST_NAME);
         rateRequest.setLastName(LAST_NAME);
-        BaseResponse response = tastingController.rateBeer(rateRequest);
+        ResponseEntity<BaseResponse> response = tastingController.rateBeer(rateRequest);
 
-        assertThat(response.getCode(), is(equalTo(400)));
-        assertThat(response.getPayload(), is(equalTo("Must provide rating between 1 and 5")));
+        assertThat(response.getStatusCode(), is(equalTo(HttpStatus.BAD_REQUEST)));
+        assertThat(response.getBody().getPayload(), is(equalTo("Must provide rating between 1 and 5")));
     }
 
     @Test
@@ -676,11 +677,11 @@ public class IntegrationTests {
         rateRequest.setBrewery(BEER_BREWERY);
         rateRequest.setFirstName(FIRST_NAME);
         rateRequest.setLastName(LAST_NAME);
-        BaseResponse response = tastingController.rateBeer(rateRequest);
+        ResponseEntity<BaseResponse> response = tastingController.rateBeer(rateRequest);
 
 
-        assertThat(response.getCode(), is(equalTo(400)));
-        assertThat(response.getPayload(), is(equalTo("Must provide rating between 1 and 5")));
+        assertThat(response.getStatusCode(), is(equalTo(HttpStatus.BAD_REQUEST)));
+        assertThat(response.getBody().getPayload(), is(equalTo("Must provide rating between 1 and 5")));
     }
 
     @Test
@@ -695,10 +696,10 @@ public class IntegrationTests {
             setFirstName(FIRST_NAME + "_you will never find me");
             setLastName(LAST_NAME);
         }};
-        BaseResponse response = tastingController.rateBeer(rateRequest);
+        ResponseEntity<BaseResponse> response = tastingController.rateBeer(rateRequest);
 
-        assertThat(response.getPayload(), is(equalTo("This account was not found")));
-        assertThat(response.getCode(), is(equalTo(404)));
+        assertThat(response.getBody().getPayload(), is(equalTo("This account was not found")));
+        assertThat(response.getStatusCode(), is(equalTo(HttpStatus.NOT_FOUND)));
     }
 
     @Test
@@ -712,10 +713,10 @@ public class IntegrationTests {
         rateRequest.setBrewery(BEER_BREWERY);
         rateRequest.setFirstName(FIRST_NAME);
         rateRequest.setLastName(LAST_NAME);
-        BaseResponse response = tastingController.rateBeer(rateRequest);
+        ResponseEntity<BaseResponse> response = tastingController.rateBeer(rateRequest);
 
-        assertThat(response.getPayload(), is(equalTo("This beer was not found")));
-        assertThat(response.getCode(), is(equalTo(404)));
+        assertThat(response.getBody().getPayload(), is(equalTo("This beer was not found")));
+        assertThat(response.getStatusCode(), is(equalTo(HttpStatus.NOT_FOUND)));
     }
 
     //TODO: This test needs to be cleaned up and refactored
@@ -744,10 +745,11 @@ public class IntegrationTests {
 
 
         //refactor this to a private method;
-        TastingsResponse tastingsResponse = tastingController.getTastingList();
+        ResponseEntity<TastingsResponse> rawResponse = tastingController.getTastingList();
+        TastingsResponse tastingsResponse = rawResponse.getBody();
 
         assertThat(tastingsResponse.getTastingsResponse().size() , is(equalTo(1)));
-        assertThat(tastingsResponse.getCode(), is(equalTo(200)));
+        assertThat(rawResponse.getStatusCode(), is(equalTo(HttpStatus.OK)));
         TastingsResponse.TastingResponse tastingResponse = tastingsResponse.getTastingsResponse().get(0);
 
 
@@ -787,7 +789,7 @@ public class IntegrationTests {
         assertThat(databaseSupport.getBeer(BEER_NAME, BEER_BREWERY), is(notNullValue()));
         assertThat(databaseSupport.getBeer(BEER_NAME + "_TWO", BEER_BREWERY + "_TWO"), is(notNullValue()));
 
-        TastingsResponse tastingsResponse = tastingController.getTastingList();
+        TastingsResponse tastingsResponse = tastingController.getTastingList().getBody();
         assertThat(tastingsResponse.getTastingsResponse().size() , is(equalTo(2)));
     }
 
@@ -881,7 +883,7 @@ public class IntegrationTests {
         accountController.addBeer(request);
         assertThat(databaseSupport.getBeer(BEER_NAME, BEER_BREWERY), is(notNullValue()));
 
-        TastingsResponse tastingsResponse = tastingController.getTastingList();
+        TastingsResponse tastingsResponse = tastingController.getTastingList().getBody();
         assertThat(tastingsResponse.getTastingsResponse().get(0).getDisplayNames().size() , is(equalTo(2)));
     }
 

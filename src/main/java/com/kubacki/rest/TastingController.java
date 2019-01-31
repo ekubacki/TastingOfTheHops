@@ -9,6 +9,8 @@ import com.kubacki.rest.response.BaseResponse;
 import com.kubacki.rest.response.TastingsResponse;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -24,7 +26,7 @@ public class TastingController {
     private static final Logger log = Logger.getLogger(TastingController.class);
 
     @RequestMapping(value = "/rate", method = RequestMethod.POST)
-    public BaseResponse rateBeer(@RequestBody BeerRateRequest rateRequest) {
+    public ResponseEntity<BaseResponse> rateBeer(@RequestBody BeerRateRequest rateRequest) {
         BaseResponse response = new BaseResponse();
         try {
             service.rateBeer(
@@ -32,51 +34,49 @@ public class TastingController {
                     new Beer(rateRequest.getName(), rateRequest.getBrewery()),
                     rateRequest.getRating()
             );
-            response.setCode(200);
         } catch (IllegalArgumentException e) {
             log.error("handling error for request: " + rateRequest, e);
-            response.setCode(400);
             response.setPayload(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         } catch (IllegalStateException e) {
             log.error("handling error for request: " + rateRequest, e);
-            response.setCode(404);
             response.setPayload(e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
-        return response;
+        return ResponseEntity.ok(response);
     }
 
     @RequestMapping(value="/tastings", method = RequestMethod.GET)
-    public TastingsResponse getTastingList() {
+    public ResponseEntity<TastingsResponse> getTastingList() {
         Map<Beer, List<Account>> allTastings = service.getAllTastings();
         return createTastingsResponse(allTastings);
     }
 
     @RequestMapping(value="/lineup", method = RequestMethod.GET)
-    public TastingsResponse getTastingsLineup() {
+    public ResponseEntity<TastingsResponse> getTastingsLineup() {
         Map<Beer, List<Account>> tastingLineup = service.getTastingLineUp();
         return createTastingsResponse(tastingLineup);
     }
 
     @RequestMapping(value="/tasted", method = RequestMethod.POST)
-    public BaseResponse beerTasted(@RequestBody BeerRequest request) {
+    public ResponseEntity<BaseResponse> beerTasted(@RequestBody BeerRequest request) {
         log.debug(request);
         BaseResponse response = new BaseResponse();
-        response.setCode(200);
         try {
             service.tastedBeer(new Beer(request.getName(), request.getBrewery()));
         } catch (IllegalStateException e) {
             log.error("The beer was not found: " + request, e);
-            response.setCode(404);
             response.setPayload(e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         } catch (IllegalArgumentException e) {
             log.error("handling error: " + request, e);
-            response.setCode(400);
             response.setPayload(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
-        return response;
+        return ResponseEntity.ok(response);
     }
 
-    private TastingsResponse createTastingsResponse(Map<Beer, List<Account>> allTastings) {
+    private ResponseEntity<TastingsResponse> createTastingsResponse(Map<Beer, List<Account>> allTastings) {
         TastingsResponse tastingsResposne = new TastingsResponse();
         for (Map.Entry<Beer, List<Account>> entry : allTastings.entrySet()) {
             Beer beer = entry.getKey();
@@ -93,8 +93,7 @@ public class TastingController {
             }
             tastingsResposne.addTastingResponse(tastingResponse);
         }
-        tastingsResposne.setCode(200);
-        return tastingsResposne;
+        return ResponseEntity.ok(tastingsResposne);
     }
 
 }
