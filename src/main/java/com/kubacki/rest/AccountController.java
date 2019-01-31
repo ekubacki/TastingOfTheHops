@@ -12,6 +12,8 @@ import com.kubacki.rest.response.BaseResponse;
 import com.kubacki.rest.response.FoundAccountResponse;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Calendar;
@@ -27,7 +29,7 @@ public class AccountController {
     private static final Logger log = Logger.getLogger(AccountController.class);
 
     @RequestMapping(value = "/signup", method = RequestMethod.POST)
-    public AccountCreateResponse create(@RequestBody AccountRequest request) {
+    public ResponseEntity<AccountCreateResponse> create(@RequestBody AccountRequest request) {
         AccountCreateResponse response = new AccountCreateResponse();
         String createdAccount;
 
@@ -43,23 +45,20 @@ public class AccountController {
             }
         } catch (IllegalArgumentException e) {
             log.error("handling error", e);
-            response.setCode(400);
             response.setPayload(e.getMessage());
-            return response;
+            return ResponseEntity.badRequest().body(response);
         } catch (IllegalStateException e) {
             log.error("handling error", e);
-            response.setCode(409);
             response.setPayload(e.getMessage());
-            return response;
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
         }
 
         response.setAccountId(createdAccount);
-        response.setCode(200);
-        return response;
+        return ResponseEntity.ok().body(response);
     }
 
     @RequestMapping(value = "/find", method = RequestMethod.POST)
-    public FoundAccountResponse find(@RequestBody FindAccountRequest request) {
+    public ResponseEntity<FoundAccountResponse> find(@RequestBody FindAccountRequest request) {
 
         Account account = service.findAccount(request.getAccountId(), request.getFirstName(),
                     request.getLastName(), request.getEmail());
@@ -67,38 +66,34 @@ public class AccountController {
 
         if (account == null) {
             log.info("account was not found: " + request);
-            response.setCode(404);
             response.setPayload("The account was not found");
-            return response;
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
 
         response.setId(account.getId());
         response.setFirstName(account.getFirstName());
         response.setLastName(account.getLastName());
         response.setEmail(account.getEmail());
-        response.setCode(200);
-        return response;
+        return ResponseEntity.ok().body(response);
     }
 
     @RequestMapping(value = "/beer", method = RequestMethod.POST)
-    public BaseResponse addBeer(@RequestBody AddBeerRequest request) {
+    public  ResponseEntity<BaseResponse> addBeer(@RequestBody AddBeerRequest request) {
         BaseResponse response = new BaseResponse();
         response.setCode(200);
 
         if(request.getBeers().size() == 0) {
             log.info("add beer request was made with no beers: " + request);
-            response.setCode(400);
             response.setPayload("Must add a beer");
-            return response;
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
 
         Account foundAccount = service.findAccount(request.getAccountId(), request.getFirstName(), request.getLastName(), request.getEmail());
 
         if (foundAccount == null) {
             log.info("account was not found: " + request);
-            response.setCode(404);
             response.setPayload("The account was not found");
-            return response;
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
 
         for(BeerRequest beerRequest : request.getBeers()) {
@@ -107,6 +102,6 @@ public class AccountController {
             service.addTasting(foundAccount.getId(), createdBeer, Calendar.getInstance().get(Calendar.YEAR));
         }
 
-        return response;
+        return ResponseEntity.ok(response);
     }
 }

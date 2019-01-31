@@ -15,6 +15,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -67,7 +69,7 @@ public class IntegrationTests {
         createRequest.setLastName(LAST_NAME);
         createRequest.setEmail(EMAIL);
 
-        AccountCreateResponse response = accountController.create(createRequest);
+        AccountCreateResponse response = accountController.create(createRequest).getBody();
         assertThat(response.getAccountId(), is(notNullValue()));
     }
 
@@ -78,12 +80,12 @@ public class IntegrationTests {
         createRequest.setLastName(LAST_NAME);
         createRequest.setEmail(EMAIL);
 
-        String createdAccountId = accountController.create(createRequest).getAccountId();
+        String createdAccountId = accountController.create(createRequest).getBody().getAccountId();
 
         FindAccountRequest findRequest = new FindAccountRequest();
         findRequest.setFirstName(FIRST_NAME);
         findRequest.setLastName(LAST_NAME);
-        FoundAccountResponse response = accountController.find(findRequest);
+        FoundAccountResponse response = accountController.find(findRequest).getBody();
 
         assertThat(response.getId(), is(equalTo(createdAccountId)));
         assertThat(response.getFirstName(), is(equalTo(FIRST_NAME)));
@@ -97,12 +99,12 @@ public class IntegrationTests {
         createRequest.setFirstName(FIRST_NAME);
         createRequest.setLastName(LAST_NAME);
 
-        String createdAccountId = accountController.create(createRequest).getAccountId();
+        String createdAccountId = accountController.create(createRequest).getBody().getAccountId();
 
         FindAccountRequest findRequest = new FindAccountRequest();
         findRequest.setFirstName(FIRST_NAME);
         findRequest.setLastName(LAST_NAME);
-        FoundAccountResponse response = accountController.find(findRequest);
+        FoundAccountResponse response = accountController.find(findRequest).getBody();
 
         assertThat(response.getId(), is(equalTo(createdAccountId)));
         assertThat(response.getFirstName(), is(equalTo(FIRST_NAME)));
@@ -116,9 +118,10 @@ public class IntegrationTests {
         createRequest.setFirstName("");
         createRequest.setLastName(LAST_NAME);
 
-        AccountCreateResponse response = accountController.create(createRequest);
-        assertThat(response.getCode(), is(equalTo(400)));
-        assertThat(response.getPayload(), is(equalTo("Must have a value for first name")));
+        ResponseEntity<AccountCreateResponse> response = accountController.create(createRequest);
+
+        assertThat(response.getStatusCode(), is(equalTo(HttpStatus.BAD_REQUEST)));
+        assertThat(response.getBody().getPayload(), is(equalTo("Must have a value for first name")));
     }
 
     @Test
@@ -127,9 +130,10 @@ public class IntegrationTests {
         createRequest.setFirstName(FIRST_NAME);
         createRequest.setLastName("");
 
-        AccountCreateResponse response = accountController.create(createRequest);
-        assertThat(response.getCode(), is(equalTo(400)));
-        assertThat(response.getPayload(), is(equalTo("Must have a value for last name")));
+        ResponseEntity<AccountCreateResponse> response = accountController.create(createRequest);
+
+        assertThat(response.getStatusCode(), is(equalTo(HttpStatus.BAD_REQUEST)));
+        assertThat(response.getBody().getPayload(), is(equalTo("Must have a value for last name")));
     }
 
     @Test
@@ -140,9 +144,10 @@ public class IntegrationTests {
         createRequest.setFirstName(FIRST_NAME);
         createRequest.setLastName(LAST_NAME);
 
-        AccountCreateResponse response = accountController.create(createRequest);
-        assertThat(response.getCode(), is(equalTo(409)));
-        assertThat(response.getPayload(), is(equalTo("This account already exists: " + FIRST_NAME + " " + LAST_NAME)));
+        ResponseEntity<AccountCreateResponse> response = accountController.create(createRequest);
+
+        assertThat(response.getStatusCode(), is(equalTo(HttpStatus.CONFLICT)));
+        assertThat(response.getBody().getPayload(), is(equalTo("This account already exists: " + FIRST_NAME + " " + LAST_NAME)));
     }
 
     @Test
@@ -154,9 +159,9 @@ public class IntegrationTests {
         createRequest.setLastName(LAST_NAME + " really it's not");
         createRequest.setEmail(EMAIL);
 
-        AccountCreateResponse response = accountController.create(createRequest);
-        assertThat(response.getCode(), is(equalTo(409)));
-        assertThat(response.getPayload(), is(equalTo("This account already exists: " + FIRST_NAME + " " + LAST_NAME)));
+        ResponseEntity<AccountCreateResponse> response = accountController.create(createRequest);
+        assertThat(response.getStatusCode(), is(equalTo(HttpStatus.CONFLICT)));
+        assertThat(response.getBody().getPayload(), is(equalTo("This account already exists: " + FIRST_NAME + " " + LAST_NAME)));
     }
 
     @Test
@@ -167,12 +172,13 @@ public class IntegrationTests {
         request.setFirstName(FIRST_NAME);
         request.setLastName(LAST_NAME);
 
-        FoundAccountResponse response = accountController.find(request);
+        ResponseEntity<FoundAccountResponse> rawResponse = accountController.find(request);
+        FoundAccountResponse response = rawResponse.getBody();
         assertThat(response.getId(), is(notNullValue()));
         assertThat(response.getFirstName(), is(equalTo(FIRST_NAME)));
         assertThat(response.getLastName(), is(equalTo(LAST_NAME)));
         assertThat(response.getEmail(), is(nullValue()));
-        assertThat(response.getCode(), is(equalTo(200)));
+        assertThat(rawResponse.getStatusCode(), is(equalTo(HttpStatus.OK)));
     }
 
     @Test
@@ -182,7 +188,7 @@ public class IntegrationTests {
         FindAccountRequest request = new FindAccountRequest();
         request.setEmail(EMAIL);
 
-        FoundAccountResponse response = accountController.find(request);
+        FoundAccountResponse response = accountController.find(request).getBody();
         assertThat(response.getId(), is(notNullValue()));
         assertThat(response.getFirstName(), is(equalTo(FIRST_NAME)));
         assertThat(response.getLastName(), is(equalTo(LAST_NAME)));
@@ -196,7 +202,7 @@ public class IntegrationTests {
         FindAccountRequest request = new FindAccountRequest();
         request.setAccountId("ACCOUNT_ID");
 
-        FoundAccountResponse response = accountController.find(request);
+        FoundAccountResponse response = accountController.find(request).getBody();
         assertThat(response.getId(), is("ACCOUNT_ID"));
         assertThat(response.getFirstName(), is(equalTo(FIRST_NAME)));
         assertThat(response.getLastName(), is(equalTo(LAST_NAME)));
@@ -207,12 +213,13 @@ public class IntegrationTests {
     public void testFindUser_thatDoesNotExist_shouldReturn404NotFound() {
         FindAccountRequest request = new FindAccountRequest();
 
-        FoundAccountResponse response = accountController.find(request);
+        ResponseEntity<FoundAccountResponse> rawResponse = accountController.find(request);
+        FoundAccountResponse response = rawResponse.getBody();
         assertThat(response.getId(), is(nullValue()));
         assertThat(response.getFirstName(), is(nullValue()));
         assertThat(response.getLastName(), is(nullValue()));
         assertThat(response.getEmail(), is(nullValue()));
-        assertThat(response.getCode(), is(equalTo(404)));
+        assertThat(rawResponse.getStatusCode(), is(equalTo(HttpStatus.NOT_FOUND)));
         assertThat(response.getPayload(), is(equalTo("The account was not found")));
     }
 
@@ -294,9 +301,9 @@ public class IntegrationTests {
         beerRequest.setBrewery(BEER_BREWERY);
         request.setBeers(new ArrayList<BeerRequest>(){{add(beerRequest);}});
 
-        AccountCreateResponse response = accountController.create(request);
-        assertThat(response.getCode(), is(equalTo(400)));
-        assertThat(response.getPayload(), is(equalTo("Must have a value for beer")));
+        ResponseEntity<AccountCreateResponse> response = accountController.create(request);
+        assertThat(response.getStatusCode(), is(equalTo(HttpStatus.BAD_REQUEST)));
+        assertThat(response.getBody().getPayload(), is(equalTo("Must have a value for beer")));
     }
 
     @Test
@@ -307,9 +314,9 @@ public class IntegrationTests {
         beerRequest.setName(BEER_NAME);
         request.setBeers(new ArrayList<BeerRequest>(){{add(beerRequest);}});
 
-        AccountCreateResponse response = accountController.create(request);
-        assertThat(response.getCode(), is(equalTo(400)));
-        assertThat(response.getPayload(), is(equalTo("Must have a value for brewery")));
+        ResponseEntity<AccountCreateResponse> response = accountController.create(request);
+        assertThat(response.getStatusCode(), is(equalTo(HttpStatus.BAD_REQUEST)));
+        assertThat(response.getBody().getPayload(), is(equalTo("Must have a value for brewery")));
     }
 
     @Test
@@ -730,11 +737,10 @@ public class IntegrationTests {
             add(beerOne);
         }});
 
-        BaseResponse response = accountController.addBeer(request);
-        assertThat(response.getCode(), is(equalTo(200)));
+        ResponseEntity<BaseResponse> response = accountController.addBeer(request);
+        assertThat(response.getStatusCode(), is(equalTo(HttpStatus.OK)));
 
         assertThat(databaseSupport.getBeer(BEER_NAME, BEER_BREWERY), is(notNullValue()));
-
 
 
         //refactor this to a private method;
@@ -775,8 +781,8 @@ public class IntegrationTests {
             add(beerTwo);
         }});
 
-        BaseResponse response = accountController.addBeer(request);
-        assertThat(response.getCode(), is(equalTo(200)));
+        ResponseEntity<BaseResponse> response = accountController.addBeer(request);
+        assertThat(response.getStatusCode(), is(equalTo(HttpStatus.OK)));
 
         assertThat(databaseSupport.getBeer(BEER_NAME, BEER_BREWERY), is(notNullValue()));
         assertThat(databaseSupport.getBeer(BEER_NAME + "_TWO", BEER_BREWERY + "_TWO"), is(notNullValue()));
@@ -801,15 +807,15 @@ public class IntegrationTests {
             add(beerOne);
         }});
 
-        BaseResponse response = accountController.addBeer(request);
-        assertThat(response.getCode(), is(equalTo(200)));
+        ResponseEntity<BaseResponse> response = accountController.addBeer(request);
+        assertThat(response.getStatusCode(), is(equalTo(HttpStatus.OK)));
 
         assertThat(databaseSupport.getBeer(BEER_NAME, BEER_BREWERY), is(notNullValue()));
     }
 
     @Test
     public void testAddbeer_withUserId_shouldAddBeerAndCreateTasting() {
-        String createdAccountId = accountController.create(buildValidUserRequest()).getAccountId();
+        String createdAccountId = accountController.create(buildValidUserRequest()).getBody().getAccountId();
         AddBeerRequest request = new AddBeerRequest() {{
             setAccountId(createdAccountId);
         }};
@@ -823,8 +829,8 @@ public class IntegrationTests {
             add(beerOne);
         }});
 
-        BaseResponse response = accountController.addBeer(request);
-        assertThat(response.getCode(), is(equalTo(200)));
+        ResponseEntity<BaseResponse> response = accountController.addBeer(request);
+        assertThat(response.getStatusCode(), is(equalTo(HttpStatus.OK)));
 
         assertThat(databaseSupport.getBeer(BEER_NAME, BEER_BREWERY), is(notNullValue()));
     }
@@ -845,9 +851,9 @@ public class IntegrationTests {
             add(beerOne);
         }});
 
-        BaseResponse response = accountController.addBeer(request);
-        assertThat(response.getCode(), is(equalTo(404)));
-        assertThat(response.getPayload(), is(equalTo("The account was not found")));
+        ResponseEntity<BaseResponse> response = accountController.addBeer(request);
+        assertThat(response.getStatusCode(), is(equalTo(HttpStatus.NOT_FOUND)));
+        assertThat(response.getBody().getPayload(), is(equalTo("The account was not found")));
         assertThat(databaseSupport.getBeer(BEER_NAME, BEER_BREWERY), is(nullValue()));
     }
 
@@ -887,9 +893,9 @@ public class IntegrationTests {
             setLastName(LAST_NAME);
         }};
 
-        BaseResponse response = accountController.addBeer(request);
-        assertThat(response.getCode(), is(equalTo(400)));
-        assertThat(response.getPayload(), is(equalTo("Must add a beer")));
+        ResponseEntity<BaseResponse> response = accountController.addBeer(request);
+        assertThat(response.getStatusCode(), is(equalTo(HttpStatus.BAD_REQUEST)));
+        assertThat(response.getBody().getPayload(), is(equalTo("Must add a beer")));
     }
 
     /**
