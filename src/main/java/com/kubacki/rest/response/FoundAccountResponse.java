@@ -1,5 +1,8 @@
 package com.kubacki.rest.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class FoundAccountResponse extends BaseResponse {
     private String firstName;
     private String lastName;

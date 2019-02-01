@@ -1,8 +1,11 @@
 package com.kubacki.rest.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import java.util.ArrayList;
 import java.util.List;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class TastingsResponse extends BaseResponse {
 
     List<TastingResponse> tastings = new ArrayList<>();
@@ -15,6 +18,7 @@ public class TastingsResponse extends BaseResponse {
         return this.tastings;
     }
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public static class TastingResponse {
         List<String> displayNames = new ArrayList<>();
         String beerName;
