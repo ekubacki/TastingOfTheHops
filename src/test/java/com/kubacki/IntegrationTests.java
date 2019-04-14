@@ -113,6 +113,19 @@ public class IntegrationTests {
     }
 
     @Test
+    public void testCreateUser_withBlankEmailDifferentName_shouldCreateAccount() {
+        databaseSupport.createAccount(FIRST_NAME, LAST_NAME, "");
+
+        AccountRequest createRequest = new AccountRequest();
+        createRequest.setFirstName(FIRST_NAME + "_not the same"  );
+        createRequest.setLastName(LAST_NAME + " really it's not");
+        createRequest.setEmail("");
+
+        ResponseEntity<AccountCreateResponse> response = accountController.create(createRequest);
+        assertThat(response.getStatusCode(), is(equalTo(HttpStatus.OK)));
+    }
+
+    @Test
     public void testCreateUser_withoutFirstName_shouldReturn400BadRequest() {
         AccountRequest createRequest = new AccountRequest();
         createRequest.setFirstName("");
@@ -155,7 +168,7 @@ public class IntegrationTests {
         databaseSupport.createAccount(FIRST_NAME, LAST_NAME, EMAIL);
 
         AccountRequest createRequest = new AccountRequest();
-        createRequest.setFirstName(FIRST_NAME + "_not the same"  );
+        createRequest.setFirstName(FIRST_NAME + "_not the same");
         createRequest.setLastName(LAST_NAME + " really it's not");
         createRequest.setEmail(EMAIL);
 
@@ -584,6 +597,25 @@ public class IntegrationTests {
     public void testRateBeer_shouldReturnRatingsOnGetTastingsList() {
         accountController.create(buildValidRequestWithABeerForUser(FIRST_NAME, LAST_NAME,
                 EMAIL, BEER_NAME, BEER_BREWERY));
+
+        BeerRateRequest rateRequest = new BeerRateRequest();
+        rateRequest.setRating(3);
+        rateRequest.setName(BEER_NAME);
+        rateRequest.setBrewery(BEER_BREWERY);
+        rateRequest.setFirstName(FIRST_NAME);
+        rateRequest.setLastName(LAST_NAME);
+        ResponseEntity<BaseResponse> response = tastingController.rateBeer(rateRequest);
+        List<TastingsResponse.TastingResponse> tastingsResponse = tastingController.getTastingList().getBody().getTastingsResponse();
+
+        assertThat(response.getStatusCode(), is(equalTo(HttpStatus.OK)));
+        assertThat(tastingsResponse.get(0).getRating(), is(equalTo(3.0)));
+
+    }
+
+    @Test
+    public void testFindUserRatingForTasting_shouldReturnRatingForUser() {
+        accountController.create(buildValidRequestWithABeerForUser(FIRST_NAME, LAST_NAME,
+            EMAIL, BEER_NAME, BEER_BREWERY));
 
         BeerRateRequest rateRequest = new BeerRateRequest();
         rateRequest.setRating(3);

@@ -2,8 +2,10 @@ package com.kubacki.domain.repo;
 
 import com.kubacki.domain.Account;
 import com.kubacki.domain.Beer;
+import com.kubacki.domain.Rating;
 import com.kubacki.domain.Tasting;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
@@ -26,7 +28,7 @@ public class TastingRepo extends JdbcTemplate {
     private static final String RATING_INSERT_SQL = "Replace into ratings (beer_id, account_id, year, rating) "
             + " values(?, ?, ?, ?)";
 
-    private static final String FIND_ACCOUNT = "select * from accounts where email = ? or first_name = ? and last_name = ?";
+    private static final String FIND_ACCOUNT = "select * from accounts where email = ? and email != '' or first_name = ? and last_name = ?";
     private static final String GET_ACCOUNT = "select * from accounts where account_id = ?";
     private static final String FIND_BEER = "select * from beers where name = ? and brewery = ?";
     private static final String GET_BEER = "select * from beers where beer_id = ?";
@@ -38,6 +40,7 @@ public class TastingRepo extends JdbcTemplate {
     private static final String UPDATE_TASTINGS_TASTED = "update tastings set tasted = true where beer_id = ?";
     private static final String DELETE_LINEUP = "delete from lineup where beer_id = ?";
     private static final String GET_BEER_RATING_BY_YEAR = "select avg(cast(rating as Float)) from ratings  where beer_id = ? and year = ?";
+    private static final String GET_BEER_RATING_FOR_USER = "select rating from ratings where account_id = ? and beer_id = ?";
 
     @Autowired
     public TastingRepo(DataSource dataSource) {
@@ -143,6 +146,15 @@ public class TastingRepo extends JdbcTemplate {
     public Double getBeerRatingByYear(Beer beer, int year) {
         Object[] params = new Object[] {beer.getId(), year};
         return this.queryForObject(GET_BEER_RATING_BY_YEAR, params, Double.class);
+    }
+
+    public Integer findUserRating(String userId, String beerId) {
+        Object[] params = new Object[] {userId, beerId};
+        try {
+            return this.queryForObject(GET_BEER_RATING_FOR_USER, params, Integer.class);
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
     }
 
     public static class AccountMapper implements RowMapper<Account> {

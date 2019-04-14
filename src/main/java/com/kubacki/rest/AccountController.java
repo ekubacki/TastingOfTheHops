@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Calendar;
+import java.util.UUID;
 
 @CrossOrigin
 @RestController
@@ -97,6 +98,7 @@ public class AccountController {
 
         for(BeerRequest beerRequest : request.getBeers()) {
             Beer beer = new Beer(beerRequest.getName(), beerRequest.getBrewery());
+            beer.setId(UUID.randomUUID().toString());
             String createdBeer = service.addBeer(beer);
             service.addTasting(foundAccount.getId(), createdBeer, Calendar.getInstance().get(Calendar.YEAR));
         }

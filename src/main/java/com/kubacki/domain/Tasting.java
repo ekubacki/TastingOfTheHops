@@ -40,4 +40,8 @@ public class Tasting {
     public void setRating(int rating) {
         this.rating = rating;
     }
+
+    public void setBeerId(String beerId) {
+        this.beerId = beerId;
+    }
 }

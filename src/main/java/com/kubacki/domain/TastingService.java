@@ -25,9 +25,19 @@ public class TastingService {
         return repo.findAccount(firstName, lastName, email);
     }
 
+    public Integer findUserRating(String userId, String beerId) {
+        Integer userRating = repo.findUserRating(userId, beerId);
+        if(userRating == null) {
+            throw new IllegalStateException("Could not find rating for user : " + userId + " and beer: " + beerId);
+        }
+
+        return userRating;
+    }
+
     public String addBeer(Beer beer) {
         Beer searchBeer = repo.findBeer(beer);
         if(searchBeer == null) {
+            beer.setId(UUID.randomUUID().toString());
             return repo.addBeer(beer);
         }
         return searchBeer.getId();

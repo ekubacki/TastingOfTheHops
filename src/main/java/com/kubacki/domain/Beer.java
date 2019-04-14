@@ -4,7 +4,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.Map;
 import java.util.Objects;
-import java.util.UUID;
 
 public class Beer {
     private String name;
@@ -13,7 +12,6 @@ public class Beer {
     private transient Map<Integer, Double> yearlyRating;
 
     public Beer(String name, String brewery) {
-        this.id = UUID.randomUUID().toString();
         this.name = mustNotBeEmpty(name, "beer");
         this.brewery = mustNotBeEmpty(brewery, "brewery");
     }

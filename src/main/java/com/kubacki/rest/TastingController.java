@@ -5,8 +5,10 @@ import com.kubacki.domain.Beer;
 import com.kubacki.domain.TastingService;
 import com.kubacki.rest.request.BeerRateRequest;
 import com.kubacki.rest.request.BeerRequest;
+import com.kubacki.rest.request.UserRatingRequest;
 import com.kubacki.rest.response.BaseResponse;
 import com.kubacki.rest.response.TastingsResponse;
+import com.kubacki.rest.response.UserRatingResponse;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -28,6 +30,7 @@ public class TastingController {
     @RequestMapping(value = "/rate", method = RequestMethod.POST)
     public ResponseEntity<BaseResponse> rateBeer(@RequestBody BeerRateRequest rateRequest) {
         BaseResponse response = new BaseResponse();
+
         try {
             service.rateBeer(
                     new Account(rateRequest.getFirstName(), rateRequest.getLastName()),
@@ -76,6 +79,20 @@ public class TastingController {
         return ResponseEntity.ok(response);
     }
 
+    @RequestMapping(value="/rating/find", method = RequestMethod.POST)
+    public ResponseEntity<UserRatingResponse> findUserRating(@RequestBody UserRatingRequest request) {
+        log.debug(request);
+        UserRatingResponse response = new UserRatingResponse(0);
+        try {
+            Integer rating = service.findUserRating(request.getUserId(), request.getBeerId());
+            return createUserRatingResponse(rating);
+        } catch (IllegalStateException e) {
+            log.error("The rating was not found: " + request, e);
+            response.setPayload(e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+    }
+
     private ResponseEntity<TastingsResponse> createTastingsResponse(Map<Beer, List<Account>> allTastings) {
         TastingsResponse tastingsResposne = new TastingsResponse();
         for (Map.Entry<Beer, List<Account>> entry : allTastings.entrySet()) {
@@ -87,6 +104,7 @@ public class TastingController {
             tastingResponse.setBeerName(beer.getName());
             tastingResponse.setBrewery(beer.getBrewery());
             tastingResponse.setRating(beer.getYearlyRating().get(Calendar.getInstance().get(Calendar.YEAR)));
+            tastingResponse.setId(beer.getId());
 
             for (Account account : accountsThatBroughtBeer) {
                 tastingResponse.addDisplayNames(account.getDisplayName());
@@ -94,6 +112,11 @@ public class TastingController {
             tastingsResposne.addTastingResponse(tastingResponse);
         }
         return ResponseEntity.ok(tastingsResposne);
+    }
+
+    private ResponseEntity<UserRatingResponse> createUserRatingResponse(Integer rating) {
+        UserRatingResponse userRatingResponse = new UserRatingResponse(rating);
+        return ResponseEntity.ok(userRatingResponse);
     }
 
 }
