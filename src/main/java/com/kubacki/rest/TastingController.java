@@ -49,6 +49,24 @@ public class TastingController {
         return ResponseEntity.ok(response);
     }
 
+    @RequestMapping(value = "/{beerId}", method = RequestMethod.DELETE)
+    public ResponseEntity<BaseResponse> deleteTasting(@PathVariable String beerId) {
+        BaseResponse response = new BaseResponse();
+
+        try {
+            service.deleteTasting(beerId);
+        } catch (IllegalArgumentException e) {
+            log.error("handling error for delete beer request: " + e);
+            response.setPayload(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        } catch (IllegalStateException e) {
+            log.error("handling error for delete beer request: " + e);
+            response.setPayload(e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+        return ResponseEntity.ok(response);
+    }
+
     @RequestMapping(value="/tastings", method = RequestMethod.GET)
     public ResponseEntity<TastingsResponse> getTastingList() {
         Map<Beer, List<Account>> allTastings = service.getAllTastings();

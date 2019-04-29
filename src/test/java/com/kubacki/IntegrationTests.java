@@ -932,6 +932,38 @@ public class IntegrationTests {
         assertThat(response.getBody().getPayload(), is(equalTo("Must add a beer")));
     }
 
+    @Test
+    public void testDeleteTasting_withId_shouldDeleteTasting() {
+        Beer beer = createTestBeer();
+        assertThat(databaseSupport.getBeer(BEER_NAME, BEER_BREWERY), is(notNullValue()));
+
+        tastingController.deleteTasting(beer.getId());
+
+        assertThat(databaseSupport.getTasting(beer.getId()), is(nullValue()));
+    }
+
+    private Beer createTestBeer() {
+        String createdAccountId = accountController.create(buildValidUserRequest()).getBody().getAccountId();
+        AddBeerRequest request = new AddBeerRequest() {{
+            setAccountId(createdAccountId);
+        }};
+
+        BeerRequest beerOne = new BeerRequest(){{
+            setName(BEER_NAME);
+            setBrewery(BEER_BREWERY);
+        }};
+
+        request.setBeers(new ArrayList<BeerRequest>(){{
+            add(beerOne);
+        }});
+
+        ResponseEntity<BaseResponse> response = accountController.addBeer(request);
+
+        assertThat(response.getStatusCode(), is(equalTo(HttpStatus.OK)));
+        assertThat(databaseSupport.getBeer(BEER_NAME, BEER_BREWERY), is(notNullValue()));
+        return databaseSupport.getBeer(BEER_NAME, BEER_BREWERY);
+    }
+
     /**
      * This is a helper method that helps with debugging.
      * @param tastingsLineup

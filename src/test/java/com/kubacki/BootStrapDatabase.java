@@ -57,6 +57,7 @@ public class BootStrapDatabase extends JdbcTemplate {
     private static final String ACCOUNT_INSERT_SQL = "Insert into ACCOUNTS (account_id,first_name,last_name, email) "//
             + " values (?,?,?,?)";
     private static final String GET_BEER = "select * from beers where name = ? and brewery = ?";
+    private static final String GET_TASTING = "select * from tastings where beer_id = ?";
     private static final String BEER_INSERT_SQL = "Insert into BEERS (beer_id, name, brewery) "//
             + " values (?,?,?)";
     private static final String UPDATE_TASTING = "update tastings set year = ? where beer_id = ?";
@@ -120,5 +121,14 @@ public class BootStrapDatabase extends JdbcTemplate {
     public void updateTastingsYear(String beer_id, int year) {
         Object[] params = new Object[] { year, beer_id};
         this.update(UPDATE_TASTING, params);
+    }
+
+    public Beer getTasting(String beer_id) {
+        Object[] params = new Object[] {beer_id};
+        try {
+            return this.queryForObject(GET_TASTING, params, new TastingRepo.BeerMapper());
+        } catch(EmptyResultDataAccessException e) {
+            return null;
+        }
     }
 }

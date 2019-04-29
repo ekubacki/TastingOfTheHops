@@ -5,6 +5,7 @@ import com.kubacki.domain.Beer;
 import com.kubacki.domain.Rating;
 import com.kubacki.domain.Tasting;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -39,6 +40,7 @@ public class TastingRepo extends JdbcTemplate {
     private static final String DELETE_ALL_LINEUPS = "delete from lineup";
     private static final String UPDATE_TASTINGS_TASTED = "update tastings set tasted = true where beer_id = ?";
     private static final String DELETE_LINEUP = "delete from lineup where beer_id = ?";
+    private static final String DELETE_TASTING = "delete from tastings where beer_id = ?";
     private static final String GET_BEER_RATING_BY_YEAR = "select avg(cast(rating as Float)) from ratings  where beer_id = ? and year = ?";
     private static final String GET_BEER_RATING_FOR_USER = "select rating from ratings where account_id = ? and beer_id = ?";
 
@@ -154,6 +156,15 @@ public class TastingRepo extends JdbcTemplate {
             return this.queryForObject(GET_BEER_RATING_FOR_USER, params, Integer.class);
         } catch (EmptyResultDataAccessException e) {
             return null;
+        }
+    }
+
+    public void deleteTasting(String beerId) {
+        Object[] params = new Object[] {beerId};
+        try {
+            this.update(DELETE_TASTING, params);
+        } catch (DataAccessException e) {
+            throw new IllegalStateException("Could not find beer to delete");
         }
     }
 

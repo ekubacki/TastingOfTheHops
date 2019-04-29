@@ -1,6 +1,7 @@
 package com.kubacki.domain;
 
 import com.kubacki.domain.repo.TastingRepo;
+import org.h2.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;
@@ -72,6 +73,14 @@ public class TastingService {
         }
         repo.removeFromLineup(foundBeer);
         repo.beerTasted(foundBeer);
+
+    }
+
+    public void deleteTasting(String beerId) {
+        if(StringUtils.isNullOrEmpty(beerId)) {
+            throw new IllegalArgumentException("Need a beerId to delete beer");
+        }
+        repo.deleteTasting(beerId);
     }
 
     private Map<Beer, List<Account>> getTastingsListMap(List<Tasting> allTastings) {
